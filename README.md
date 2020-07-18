@@ -1,2 +1,37 @@
-# faka
-个人发卡系统，专业的二次元动漫发卡源码！
+<p align="center"><img src="https://lizhime.com/wp-content/uploads/2020/07/%E5%B0%81%E9%9D%A2.png" width="600"></p>
+
+<p align="center">
+<a href="https://lizhime.com/41.html"><img src="https://travis-ci.org/laravel/framework.svg" alt="Build Status"></a>
+<a href="https://lizhime.com/41.html"><img src="https://poser.pugx.org/laravel/framework/v/stable.svg" alt="Latest Stable Version"></a>
+<a href="https://lizhime.com/41.html"><img src="https://poser.pugx.org/laravel/framework/license.svg" alt="License"></a>
+</p>
+
+## 关于荔枝发卡系统
+
+荔枝发卡系统乃博主历尽数天开发完成，原生php开发，数据库底层使用`Eloquent ORM`组件，模板渲染使用`Smarty3.1`组件，会话保持使用`session`开发，欢迎各位欧尼酱使用以及转载。
+
+- 云更新，为了去掉繁琐的后续版本更新又要下载又要升级数据库等等琐事，所以本程序实现了自动更新，一旦出现新版本，后台只需要点击按钮即可自动完成程序的所有无缝升级。
+- 基础功能，卡密销售，后台添加商品，然后导入卡密，进行售卡。
+- 批发优惠功能，商品中可开启批发优惠功能，以及编写优惠规则，客户一次性购买达到规定数量则会进行优惠。
+- 支付对接，为了满足所有人的需求，让用户自己对接支付平台是不现实的，所以支付对接请交给作者，如果你想接入其他支付平台，你只需要将需求提交给作者，作者会在2小时内完成对接，届时，你只需要在后台添加新的支付方式就可以立即使用。
+- 界面优化，完美支持PC和手机，真正的内外二次元文化。
+- 还有更多强大的功能，需要安装自己发掘。至此，介绍完毕。
+
+## 程序安装教程
+
+- 在安装之前，请检查你的系统环境，php>=7.2，MySQL版本>=5.6，如果你满足这两个条件，表示你已经具备了安装条件。
+- 在本文章底部下载源码，然后上传至你的服务器或虚拟空间的网站根目录
+- 以上步骤完成后，然后配置伪静态，Apache无需配置，根目录已经有.htaccess文件了，但如果你是Nginx，则需要配置伪静态。
+- 下面是Nginx伪静态规则：
+```
+location / {
+      if (!-e $request_filename){
+              rewrite ^(.*)$ /index.php?s=$1 last; break;
+      }
+}
+```
+- 配置完成后，访问你的首页，即可开始安装。
+- 安装完成后，后台地址是：`https://你的域名/admin`
+## 更多支持
+- 交流QQ群：1142236180
+- 荔枝博客：https://lizhime.com
