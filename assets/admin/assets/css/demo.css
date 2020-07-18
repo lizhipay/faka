@@ -1,0 +1,47 @@
+
+.highlight{
+    background-color: transparent;
+}
+.highlight pre code {
+    font-size: inherit;
+    color: #212529;
+}
+.nt {
+    color: #2f6f9f;
+}
+.na {
+    color: #4f9fcf;
+}
+.s {
+    color: #d44950;
+}
+pre.prettyprint {
+    background-color: #eee;
+    border: 0px;
+    margin: 0;        
+    padding: 20px;
+    text-align: left;
+}
+
+.atv,
+.str {
+    color: #05AE0E;
+}
+
+.tag,
+.pln,
+.kwd {
+    color: #3472F7;
+}
+
+.atn {
+    color: #2C93FF;
+}
+
+.pln {
+    color: #a5a5a5;
+}
+
+.com {
+    color: #999;
+}

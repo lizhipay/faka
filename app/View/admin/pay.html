@@ -1,0 +1,139 @@
+#{include file="./header.html"}
+<div id="main-content">
+
+    <div class="container-fluid" style="margin-top: 20px">
+        <div class="row clearfix">
+
+            <div class="col-xl-12 col-lg-12 col-md-12">
+                <div class="card">
+                    <div class="header">
+                        <h2>支付方式（所有支付方式均对接“荔枝支付”，如需要使用支付功能，请在官网：<a href="https://lizhifu.net" target="_blank"><b>https://lizhifu.net</b></a>
+                            注册账号！），如果没有您想要的支付，可联系作者可免费帮忙对接（任意支付平台,对接可在30分钟内完成对接）！</h2>
+                    </div>
+                    <div class="body">
+                        <button type="button" class="btn btn-acg mb-2 btn-app-create"><i
+                                class="fa fa-plus-square"></i>
+                            <span>添加支付方式</span></button>
+                        <table id="pay-type" lay-filter="pay-type"></table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+
+    $(function () {
+        layui.use(['table', 'hex'], function () {
+            let table = layui.table;
+            var cao = layui.hex;
+
+            var tableInstance = table.render({
+                elem: '#pay-type'
+                , skin: 'nob'
+                , size: 'lg'
+                , height: 700
+                , url: '/admin/api/pay/data'
+                , page: true
+                , method: "post"
+                , response: {
+                    statusCode: 200
+                }
+                , cols: [[
+                    {
+                        field: 'id', title: 'ID'
+                    }
+                    ,
+                    {
+                        field: 'face', title: '图标', templet: function (item) {
+                            return '<img src="' + item.face + '"  style="width: 38px;"/>'
+                        }
+                    }
+                    , {field: 'name', title: '支付名称'}
+                    , {
+                        field: 'code', title: '通道编码', templet: function (item) {
+                            return '<span class="badge badge-primary">' + item.code + '</span>';
+                        }
+                    }
+                    , {
+                        field: 'status', title: '状态', templet: function (item) {
+                            if (item.status == 1) {
+                                return '<span class="badge badge-success">启用</span>';
+                            }
+                            return '<span class="badge badge-default">停用</span>';
+                        }
+                    }
+                    , {field: 'create_date', title: '创建时间'}
+                    , {
+                        templet: function (item) {
+                            let html = '<button type="button" data-id="' + item.id + '" class="btn btn-info layui-btn-xs edit"><i class="fa fa-edit"></i>修改</button> ';
+                            if (item.status == 0) {
+                                html += '<button type="button" data-id="' + item.id + '" class="btn btn-success layui-btn-xs start"><i class="fa fa-play"></i> 启用</button> ';
+                            } else {
+                                html += '<button type="button" data-id="' + item.id + '" class="btn btn-danger layui-btn-xs stop"><i class="fa fa-pause"></i> 停用</button> ';
+                            }
+                            html += '<button type="button" data-id="' + item.id + '" class="btn btn-danger layui-btn-xs del"><i class="fa fa-trash-o"></i> 移除</button> ';
+                            return html;
+                        }
+                    }
+                ]],
+                done: res => {
+                    cao.setIdMap(res.data);
+
+                    $('.edit').click(function () {
+                        let mapItem = cao.getMapItem(this);
+                        modal(mapItem);
+                    });
+
+                    $('.del').click(function () {
+                        let id = cao.getObjectId(this);
+                        console.log(id)
+                        layer.confirm('您正在移除该支付方式，是否要继续？', {
+                            btn: ['确认移除', '取消']
+                        }, function () {
+                            $.post('/admin/api/pay/del', {list: [id]}, res => {
+                                layer.msg(res.msg);
+                                tableInstance.reload();
+                            });
+                        });
+                    });
+
+                    $('.start').click(function () {
+                        let id = cao.getObjectId(this);
+                        $.post('/admin/api/pay/save', {id: id, status: 1}, res => {
+                            layer.msg(res.msg);
+                            tableInstance.reload();
+                        });
+                    });
+
+                    $('.stop').click(function () {
+                        let id = cao.getObjectId(this);
+                        $.post('/admin/api/pay/save', {id: id, status: 0}, res => {
+                            layer.msg(res.msg);
+                            tableInstance.reload();
+                        });
+                    });
+                }
+            });
+
+            let modal = (values = {}) => {
+                cao.popup('/admin/api/pay/save', [
+                    {title: "显示图标", name: "face", type: "image", placeholder: "请选择64*64的图片", width: 64},
+                    {title: "支付名称", name: "name", type: "input", placeholder: "请输入支付方式名称（前台显示用）"},
+                    {title: "通道编码", name: "code", type: "input", placeholder: "请在荔枝付控制台获取通道ID"},
+                    {title: "状态", name: "status", type: "switch", text: "启用"},
+                ], res => {
+                    tableInstance.reload();
+                }, values);
+            }
+
+            $('.btn-app-create').click(function () {
+                modal();
+            });
+        });
+    });
+</script>
+
+#{include file="./footer.html"}

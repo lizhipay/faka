@@ -1,0 +1,149 @@
+#{include file="./header.html"}
+<div id="main-content">
+
+    <div class="container-fluid" style="margin-top: 20px">
+        <div class="row clearfix">
+
+            <div class="col-xl-12 col-lg-12 col-md-12">
+                <div class="card">
+                    <div class="header">
+                        <h2>商品分类</h2>
+                    </div>
+                    <div class="body">
+                        <button type="button" class="btn btn-acg mb-2 btn-app-create"><i
+                                class="fa fa-plus-square"></i>
+                            <span>添加商品分类</span></button>
+
+                        <button type="button" class="btn btn-acg mb-2 btn-app-del"><i
+                                class="fa  icon-trash"></i>
+                            <span>移除选中</span></button>
+
+                        <table id="category" lay-filter="category"></table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+
+    $(function () {
+        layui.use(['table', 'hex'], function () {
+            let table = layui.table;
+            var cao = layui.hex;
+
+            var tableInstance = table.render({
+                elem: '#category'
+                , skin: 'nob'
+                , size: 'lg'
+                , height: 700
+                , url: '/admin/api/category/data'
+                , page: true
+                , method: "post"
+                , response: {
+                    statusCode: 200
+                }
+                , cols: [[
+                    {
+                        type: 'checkbox', fixed: 'left'
+                    }
+                    , {field: 'name', title: '分类名称'}
+                    , {field: 'commodity_count', title: '商品数量'}
+                    , {
+                        field: 'status', title: '状态', templet: function (item) {
+                            if (item.status == 1) {
+                                return '<span class="badge badge-success">启用</span>';
+                            }
+                            return '<span class="badge badge-default">停用</span>';
+                        }
+                    }
+                    , {field: 'sort', title: '排序(越小越前)'}
+                    , {
+                        templet: function (item) {
+                            let html = '<button type="button" data-id="' + item.id + '" class="btn btn-info layui-btn-xs edit"><i class="fa fa-edit"></i>修改</button> ';
+                            if (item.status == 0) {
+                                html += '<button type="button" data-id="' + item.id + '" class="btn btn-success layui-btn-xs start"><i class="fa fa-play"></i> 启用</button> ';
+                            } else {
+                                html += '<button type="button" data-id="' + item.id + '" class="btn btn-danger layui-btn-xs stop"><i class="fa fa-pause"></i> 停用</button> ';
+                            }
+                            html += '<button type="button" data-id="' + item.id + '" class="btn btn-danger layui-btn-xs del"><i class="fa fa-trash-o"></i> 移除</button> ';
+                            return html;
+                        }
+                    }
+                ]],
+                done: res => {
+                    cao.setIdMap(res.data);
+
+                    $('.edit').click(function () {
+                        let mapItem = cao.getMapItem(this);
+                        modal(mapItem);
+                    });
+
+                    $('.del').click(function () {
+                        let id = cao.getObjectId(this);
+                        console.log(id)
+                        layer.confirm('您正在移除该分类，是否要继续？', {
+                            btn: ['确认移除', '取消']
+                        }, function () {
+                            $.post('/admin/api/category/del', {list: [id]}, res => {
+                                layer.msg(res.msg);
+                                tableInstance.reload();
+                            });
+                        });
+                    });
+
+                    $('.start').click(function () {
+                        let id = cao.getObjectId(this);
+                        $.post('/admin/api/category/save', {id: id, status: 1}, res => {
+                            layer.msg(res.msg);
+                            tableInstance.reload();
+                        });
+                    });
+
+                    $('.stop').click(function () {
+                        let id = cao.getObjectId(this);
+                        $.post('/admin/api/category/save', {id: id, status: 0}, res => {
+                            layer.msg(res.msg);
+                            tableInstance.reload();
+                        });
+                    });
+                }
+            });
+
+            let modal = (values = {}) => {
+                cao.popup('/admin/api/category/save', [
+                    {title: "分类名称", name: "name", type: "input", placeholder: "请输入分类名称"},
+                    {title: "分类排序", name: "sort", type: "input", placeholder: "值越小，排名越靠前哦~"},
+                    {title: "状态", name: "status", type: "switch", text: "启用"},
+                ], res => {
+                    tableInstance.reload();
+                }, values);
+            }
+
+            $('.btn-app-create').click(function () {
+                modal();
+            });
+
+            $('.btn-app-del').click(() => {
+                var data = cao.listObjectToArray(table.checkStatus('category').data);
+                if (data.length == 0) {
+                    layer.msg("请至少勾选1个商品分类进行操作！");
+                    return;
+                }
+
+                layer.confirm('您确定要删除已经选中的商品分类吗？这是不可恢复的操作！', {
+                    btn: ['确定', '取消']
+                }, function () {
+                    $.post("/admin/api/category/del", {list: data}, res => {
+                        layer.msg(res.msg);
+                        tableInstance.reload();
+                    });
+                });
+            });
+        });
+    });
+</script>
+
+#{include file="./footer.html"}

@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <title>登录 - #{$site.title}</title>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, initial-scale=1, shrink-to-fit=no">
+
+
+    <link rel="icon" href="/favicon.ico" type="image/x-icon"/>
+    <!-- VENDOR CSS -->
+    <link rel="stylesheet" href="/assets/admin/assets/vendor/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/assets/admin/assets/fonts/font-awesome-4.7.0/css/font-awesome.css">
+    <link rel="stylesheet" href="/assets/admin/assets/vendor/animate-css/vivify.min.css">
+
+    <!-- MAIN CSS -->
+    <link rel="stylesheet" href="/assets/admin/assets/css/site.css">
+
+</head>
+
+<body class="theme-blush">
+
+<div class="auth-main particles_js">
+    <div class="auth_div vivify popIn">
+        <div class="auth_brand">
+            <a class="navbar-brand" href="#"><img src="/favicon.ico" width="30" height="30"
+                                                  class="d-inline-block align-top mr-2" alt="">#{$site.title}</a>
+        </div>
+        <div class="card">
+            <div class="pattern">
+                <span class="red"></span>
+                <span class="indigo"></span>
+                <span class="blue"></span>
+                <span class="green"></span>
+                <span class="orange"></span>
+            </div>
+            <div class="header">
+                <p class="lead">Login</p>
+            </div>
+            <div class="body">
+                <form class="form-auth-small">
+                    <div class="form-group">
+                        <label for="username" class="control-label sr-only">账号</label>
+                        <input type="text" class="form-control round" id="username" name="username"
+                               placeholder="用户名">
+                    </div>
+                    <div class="form-group">
+                        <label for="password" class="control-label sr-only">密码</label>
+                        <input type="password" class="form-control round" id="password" name="password"
+                               placeholder="密码">
+                    </div>
+                    <button type="button" class="btn btn-primary btn-round btn-block login-btn">立即登录</button>
+                    <div class="bottom">
+
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div id="particles-js"></div>
+</div>
+<!-- END WRAPPER -->
+<script src="/assets/static/jquery.min.js"></script>
+<script src="/assets/static/layer/layer.js"></script>
+<script src="/assets/admin/assets/bundles/libscripts.bundle.js"></script>
+<script src="/assets/admin/assets/bundles/vendorscripts.bundle.js"></script>
+<script src="/assets/admin/assets/vendor/particlesjs/particles.min.js"></script>
+<script src="/assets/admin/assets/js/pages/particlesjs.js"></script>
+<script>
+    $('.login-btn').click(function () {
+        let user = $('input[name=username]').val();
+        let pass = $('input[name=password]').val();
+        let layIndex = layer.load(1, {
+            shade: [0.3, '#fff'] //0.1透明度的白色背景
+        });
+        $.post('/admin/api/auth/login', {user: user, pass: pass}, res => {
+            layer.close(layIndex);
+            layer.msg(res.msg);
+            if (res.code == 200) {
+                window.location.href = '/admin/index/home';
+            }
+        });
+    });
+
+    $("input[name=password]").keypress(function (even) {
+        if (even.which == 13) {
+            $('.login-btn').click();
+        }
+    });
+</script>
+</body>
+</html>

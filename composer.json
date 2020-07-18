@@ -1,0 +1,31 @@
+{
+  "name": "lizhi/lizhi",
+  "description": "荔枝快速开发php框架",
+  "keywords": [
+    "荔枝",
+    "lizhi"
+  ],
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "lizhi",
+      "email": "594658@qq.com",
+      "homepage": "https://github.com/lizhipay",
+      "role": "Developer"
+    }
+  ],
+  "require": {
+    "php": ">=7.0.0",
+    "smarty/smarty": "~3.1",
+    "illuminate/database": "^7.19",
+    "symfony/var-dumper": "^5.1",
+    "illuminate/pagination": "^7.19",
+    "rah/danpu": "^2.7"
+  },
+  "autoload": {
+    "psr-4": {
+      "App\\": "app/",
+      "Core\\": "core/"
+    }
+  }
+}

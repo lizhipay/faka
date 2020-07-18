@@ -1,0 +1,150 @@
+<view id="ca-qrCode">
+    <div class="layui-fluid">
+        <div class="layui-card">
+            <div class="layui-tab layui-tab-brief">
+
+                <div class="layui-tab-content">
+                    <div class="layui-tab-item layui-show">
+                        <div style="margin-bottom: 10px;">
+                            <button class="layui-btn layui-btn-primary layui-btn-sm create">
+                                上传二维码
+                            </button>
+                            <button class="layui-btn layui-btn-primary layui-btn-sm del">
+                                删除选中
+                            </button>
+                            <button class="layui-btn layui-btn-primary layui-btn-sm refresh">
+                                <i class="layui-icon layui-icon-refresh"></i>刷新
+                            </button>
+                            <div class="layui-input-inline"><input id="ca-money-query"
+                                                                   style="height: 30px;border-radius: 0px !important;"
+                                                                   type="text" required placeholder="输入金额回车查询"
+                                                                   autocomplete="off" class="layui-input"></div>
+                        </div>
+                        <table id="ca-qrCode-table"
+                               lay-filter="ca-qrCode-table"></table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</view>
+
+
+<script>
+    layui.use(['hex', 'table'], function () {
+        var $ = layui.$, table = layui.table, hex = layui.hex, tableInstance,
+            id = hex.get('caId');
+
+        let status = ['<span class="badge badge-success">未使用</span>', '<span class="badge badge-danger">正在使用</span>'];
+
+        let modal = (values = {}) => {
+            hex.popup('/user/beneficiary/ca/qrcode/saveQrCodes', [
+                {
+                    title: "收款码包",
+                    name: "path",
+                    type: "file",
+                    placeholder: "请上传zip格式的压缩包",
+                    exts: 'zip',
+                    acceptMime: "application/zip"
+                },
+                {name: 'caId', type: 'hidden', default: id},
+                {name: 'vain', title: "虚浮金额", type: 'input', placeholder: "虚浮金额,通过该金额会自动计算出绑定的金额.."}
+            ], res => {
+                tableInstance.reload();
+            }, values);
+        }
+
+        tableInstance = table.render({
+            elem: '#ca-qrCode-table'
+            , skin: 'nob'
+            // , size: 'lg'
+            , height: 590
+            , url: '/user/beneficiary/ca/qrcode/data?id=' + id
+            , page: true
+            , method: "post"
+            , limit: 13
+            , limits: [13, 20, 30, 40, 50, 100, 200]
+            , response: {
+                statusCode: 200
+            }
+            , cols: [[
+                {
+                    type: 'checkbox', fixed: 'left'
+                }
+                , {
+                    field: 'real', title: '绑定金额', width: 100
+                }
+                , {
+                    field: 'amount', title: '二维码金额', width: 100
+                }
+                , {
+                    field: 'image', title: '二维码', width: 85, templet: function (item) {
+                        return '<img class="open-image" src="' + item.image + '" style="height: 100%;cursor: pointer;max-width: 100%;">';
+                    }
+                }
+                , {
+                    field: 'qrcode', title: '二维码内容'
+                }
+                , {
+                    field: 'ca_id', title: '所属账号', templet: function (item) {
+                        if (item.ca == null) {
+                            return '-';
+                        }
+                        return item.ca.user;
+                    }, width: 130
+                }
+                , {
+                    field: 'status', title: '使用状态', width: 90, templet: function (item) {
+                        return status[item.status];
+                    }
+                }
+            ]],
+            done: res => {
+                $('.open-image').click(function () {
+                    var size = 400;
+                    var imageUrl = $(this).attr('src')
+                    layer.open({
+                        type: 1,
+                        title: false,
+                        closeBtn: 0, //不显示关闭按钮
+                        anim: 5,
+                        area: size + 'px',
+                        shadeClose: true, //开启遮罩关闭
+                        content: '<img  src="' + imageUrl + '" style="width: ' + size + 'px;">'
+                    });
+                });
+            }
+        });
+
+
+        $('#ca-qrCode .create').click(() => {
+            modal();
+        });
+
+        $('#ca-qrCode .refresh').click(() => {
+            tableInstance.reload();
+        });
+
+        $('#ca-qrCode .del').click(() => {
+            var data = hex.listObjectToArray(table.checkStatus('ca-qrCode-table').data);
+            $.post('/user/beneficiary/ca/qrcode/delete', {list: data}, res => {
+                layer.msg(res.msg);
+                tableInstance.reload();
+            });
+        });
+
+        $("#ca-money-query").keypress(function (even) {
+            if (even.which == 13) {
+                let real = $(this).val();
+                tableInstance.reload({
+                    where: {
+                        'equal-real': real
+                    }
+                    , page: {
+                        curr: 1
+                    }
+                });
+            }
+        });
+    });
+</script>

@@ -1,0 +1,204 @@
+#{include file="./header.html"}
+<div id="main-content">
+    <div class="container-fluid" style="margin-top: 20px">
+        <div class="row clearfix">
+
+            <div class="col-xl-12 col-lg-12 col-md-12">
+                <div class="card">
+                    <div class="header">
+                        <h2>卡密管理</h2>
+                    </div>
+                    <div class="body">
+                        <button type="button" class="btn btn-acg mb-2 btn-app-create"><i
+                                class="fa fa-plus-square"></i>
+                            <span>添加卡密</span></button>
+
+                        <button type="button" class="btn btn-acg mb-2 btn-app-del"><i
+                                class="fa  icon-trash"></i>
+                            <span>移除选中</span></button>
+
+                        <button type="button" class="btn btn-acg mb-2 btn-app-lock"><i
+                                class="fa icon-lock"></i>
+                            <span>锁定选中</span></button>
+
+                        <button type="button" class="btn btn-acg mb-2 btn-app-unlock"><i
+                                class="fa icon-lock-open"></i>
+                            <span>解锁选中</span></button>
+                        <form class="search-query">
+                            <div class="layui-input-inline" style="padding-top:10px;width: 110px !important;">
+                                <button type="button" class="layui-btn layui-btn-primary layui-btn-sm export"><i
+                                        class="layui-icon layui-icon-export"></i>导出右边筛选
+                                </button>
+                            </div>
+                        </form>
+                        <table id="commodity-card" lay-filter="commodity-card"></table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(function () {
+        layui.use(['table', 'hex'], function () {
+            let table = layui.table;
+            var cao = layui.hex;
+
+            let status = ['<span class="badge badge-danger">未出售</span>', '<span class="badge badge-success">已出售</span>', '<span class="badge badge-default">被锁定</span>'];
+
+            var tableInstance = table.render({
+                elem: '#commodity-card'
+                , skin: 'nob'
+                , size: 'lg'
+                , height: 650
+                , url: '/admin/api/card/data'
+                , page: true
+                , method: "post"
+                , limit: 11
+                , limits: [11, 20, 30, 50, 100, 500, 1000, 5000, 10000, 50000]
+                , response: {
+                    statusCode: 200
+                }
+                , cols: [[
+                    {
+                        type: 'checkbox', fixed: 'left'
+                    }
+                    , {
+                        field: 'card', title: '卡密信息', templet: function (item) {
+                            return '<span class="badge badge-info">' + item.card + '</span>';
+                        }
+                    }
+                    , {
+                        field: 'commodity_id', title: '所属商品', templet: function (item) {
+                            if (item.commodity == null) {
+                                return '-';
+                            }
+                            return '<span class="badge badge-primary">' + item.commodity.name + '</span>';
+                        }, width: 400
+                    }
+                    , {field: 'create_date', title: '添加时间'}
+                    , {
+                        field: 'buy_date', title: '出售时间', templet: function (item) {
+                            if (item.buy_date == null) {
+                                return '-';
+                            }
+                            return item.buy_date;
+                        }
+                    }, {
+                        field: 'contact', title: '购买者', templet: function (item) {
+                            if (item.contact == null) {
+                                return '-';
+                            }
+                            return item.contact;
+                        }
+                    }
+                    , {
+                        field: 'status', title: '卡密状态', templet: function (item) {
+                            return status[item.status];
+                        }
+                    }
+                ]],
+                done: res => {
+                }
+            });
+
+            let modal = (values = {}) => {
+                cao.popup('/admin/api/card/save', [
+                    {
+                        title: "选择商品",
+                        name: "commodity_id",
+                        type: "select",
+                        dict: "commodity,id,name",
+                        placeholder: "请选择商品"
+                    },
+                    {title: "卡密列表", name: "cards", type: "textarea", placeholder: "卡密一行一个", height: 500}
+                ], res => {
+                    tableInstance.reload();
+                }, values);
+            }
+
+            $('.btn-app-create').click(function () {
+                modal();
+            });
+
+            $('.btn-app-del').click(() => {
+                var data = cao.listObjectToArray(table.checkStatus('commodity-card').data);
+                if (data.length == 0) {
+                    layer.msg("请至少勾选1个卡密进行操作！");
+                    return;
+                }
+                layer.confirm('您确定要删除已经选中的卡密吗？这是不可恢复的操作！', {
+                    btn: ['确定', '取消']
+                }, function () {
+                    $.post("/admin/api/card/del", {list: data}, res => {
+                        layer.msg(res.msg);
+                        tableInstance.reload();
+                    });
+                });
+            });
+
+            $('.btn-app-lock').click(() => {
+                var data = cao.listObjectToArray(table.checkStatus('commodity-card').data);
+                if (data.length == 0) {
+                    layer.msg("请至少勾选1个卡密进行操作！");
+                    return;
+                }
+                layer.confirm('您确定要锁定选中的卡密吗？', {
+                    btn: ['确定', '取消']
+                }, function () {
+                    $.post("/admin/api/card/lock", {list: data}, res => {
+                        layer.msg(res.msg);
+                        tableInstance.reload();
+                    });
+                });
+            });
+
+            $('.btn-app-unlock').click(() => {
+                var data = cao.listObjectToArray(table.checkStatus('commodity-card').data);
+                if (data.length == 0) {
+                    layer.msg("请至少勾选1个卡密进行操作！");
+                    return;
+                }
+                layer.confirm('您确定要解锁选中的卡密吗？', {
+                    btn: ['确定', '取消']
+                }, function () {
+                    $.post("/admin/api/card/unlock", {list: data}, res => {
+                        layer.msg(res.msg);
+                        tableInstance.reload();
+                    });
+                });
+            });
+
+
+            $('.export').click(function () {
+                let query = $('.search-query').serialize();
+                window.open('/admin/api/card/export?' + query);
+            });
+
+            cao.query('.search-query', tableInstance, [
+                {title: "卡密", name: "equal-card", type: "input", width: 160},
+                {
+                    title: "选择商品",
+                    name: "equal-commodity_id",
+                    type: "select",
+                    dict: "commodity,id,name",
+                    width: 160,
+                    search: true
+                },
+                {
+                    title: "订单状态", name: "equal-status", type: "select", dict: [
+                        {id: 0, name: "未售"},
+                        {id: 1, name: "已售"},
+                        {id: 2, name: "锁定"},
+                    ], width: 160
+                },
+                {title: "开始时间", name: "betweenStart-create_date", type: "date", width: 160},
+                {title: "结束时间", name: "betweenEnd-create_date", type: "date", width: 160},
+                {title: "联系方式", name: "equal-contact", type: "input", width: 160},
+            ], true, false);
+        });
+    });
+</script>
+
+#{include file="./footer.html"}

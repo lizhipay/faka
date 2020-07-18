@@ -1,0 +1,127 @@
+#{include file="./header.html"}
+<div id="main-content">
+    <div class="container-fluid" style="margin-top: 20px">
+
+        <div class="row clearfix">
+
+            <div class="col-xl-12 col-lg-12 col-md-12">
+                <div class="card">
+                    <div class="header">
+                        <h2>网站配置</h2>
+                    </div>
+                    <div class="body">
+                        <form id="data-form" method="post">
+
+                            <div class="form-group">
+                                <label>ICO/图标,注意:请上传.ico后缀的文件哦~</label><br>
+                                <input type="file" style="display: none;" class="face">
+                                <input type="hidden" name="ico" class="faceInput" value="/favicon.ico">
+                                <img class="display-face" onclick="document.getElementsByClassName('face')[0].click()"
+                                     src="/favicon.ico" alt="头像"
+                                     style="height: 100px;border-radius: 10px;border: 1px solid #80808047;box-shadow: 3px 3px 3px #888888;cursor:pointer;">
+                            </div>
+
+                            <div class="form-group">
+                                <label>图床/背景图片地址（这里就是控制后台背景和前台背景的地方，下面直接放一个图片链接即可）</label>
+                                <input type="text" name="backgroundUrl" class="form-control" value="#{$config.backgroundUrl}" placeholder="后台的动漫背景和前台的动漫背景都是这里控制的">
+                            </div>
+
+                            <div class="form-group">
+                                <label>网站名称</label>
+                                <input type="text" name="title" class="form-control" value="#{$config.title}" placeholder="网站名称，一般2-8个字是最优雅的">
+                            </div>
+
+                            <div class="form-group">
+                                <label>浏览器标题</label>
+                                <input type="text" name="seo_title" class="form-control" value="#{$config.seo_title}" placeholder="浏览器标题，前台显示在浏览器上的名称">
+                            </div>
+
+                            <div class="form-group">
+                                <label>关键词</label>
+                                <input type="text" name="keywords" class="form-control" value="#{$config.keywords}" placeholder="请输入网站关键词">
+                            </div>
+
+                            <div class="form-group">
+                                <label>网站描述</label>
+                                <input type="text" name="description" class="form-control"
+                                       value="#{$config.description}" placeholder="请输入网站描述">
+                            </div>
+
+                            <div class="form-group">
+                                <label>公告</label>
+                                <textarea class="form-control" name="notice" placeholder="支持HTML语法">#{$config.notice}</textarea>
+                            </div>
+                            <div class="form-group">
+                                <input type="hidden" name="pass" value="#{$config.pass}" class="passText">
+                                <label><input class="passBtn" type="checkbox" #{if $config.pass == 1} checked #{/if}><span style="color: red;position: relative;top: -1px;left: 5px;">启用密码（客户在查询订单时需要输入购买时填写的查询密码）</span></label>
+                            </div>
+
+                            <br>
+                            <button type="button" class="btn btn-primary edit">立即修改</button>
+                        </form>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    $(function () {
+        layui.use(['layer', 'form', 'hex'], function () {
+
+            let hex = layui.hex;
+
+            $('.passBtn').click(function () {
+               if ($(this).prop('checked') == true){
+                   $('.passText').val(1);
+               }else{
+                   $('.passText').val(0);
+               }
+            });
+
+
+            $('.face').change(function () {
+                let formdata = new FormData();
+                formdata.append("file", $('.face')[0].files[0]);
+                let index = layer.load(1, {
+                    shade: [0.3, '#fff']
+                });
+
+                $.ajax({
+                    type: "POST",
+                    url: "/admin/api/upload/handle",
+                    data: formdata,
+                    contentType: false, // 不设置内容类型
+                    processData: false, // 不处理数据
+                    dataType: "json",
+                    success: function (res) {
+                        layer.close(index);
+                        if (res.code == 200) {
+                            layer.msg('图标上传成功，但需要保存后才会生效哦~');
+                            $('.faceInput').val(res.data.path);
+                            $('.display-face').attr('src', res.data.path);
+                        } else {
+                            layer.msg(res.msg);
+                        }
+                    },
+                    error: function (data) {
+                        layer.close(index);
+                        layer.msg('上传失败');
+                    }
+                });
+            });
+
+            $('.edit').click(function () {
+                $.post('/admin/api/config/edit', $('#data-form').serialize(), res => {
+                    layer.msg(res.msg);
+                });
+            });
+
+        });
+    });
+</script>
+
+#{include file="./footer.html"}

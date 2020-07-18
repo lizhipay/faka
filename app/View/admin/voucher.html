@@ -1,0 +1,173 @@
+#{include file="./header.html"}
+<div id="main-content">
+
+    <div class="container-fluid" style="margin-top: 20px">
+        <div class="row clearfix">
+
+            <div class="col-xl-12 col-lg-12 col-md-12">
+                <div class="card">
+                    <div class="header">
+                        <h2>优惠卷管理</h2>
+                    </div>
+                    <div class="body">
+                        <button type="button" class="btn btn-acg mb-2 btn-app-create"><i
+                                class="fa fa-plus-square"></i>
+                            <span>生成优惠卷</span></button>
+
+                        <button type="button" class="btn btn-acg mb-2 btn-app-del"><i
+                                class="fa  icon-trash"></i>
+                            <span>移除选中</span></button>
+
+                        <form class="search-query">
+                            <div class="layui-input-inline" style="padding-top:10px;width: 110px !important;">
+                                <button type="button" class="layui-btn layui-btn-primary layui-btn-sm export"><i
+                                        class="layui-icon layui-icon-export"></i>导出右边筛选
+                                </button>
+                            </div>
+                        </form>
+                        <table id="voucher" lay-filter="voucher"></table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+
+    $(function () {
+        layui.use(['table', 'hex'], function () {
+            let table = layui.table;
+            var cao = layui.hex;
+
+            let status = ['<span class="badge badge-success">未使用</span>', '<span class="badge badge-danger">已使用</span>'];
+
+            var tableInstance = table.render({
+                elem: '#voucher'
+                , skin: 'nob'
+                , size: 'lg'
+                , height: 650
+                , url: '/admin/api/voucher/data'
+                , page: true
+                , method: "post"
+                , limit: 11
+                , limits: [11, 20, 30, 50, 100, 500, 1000]
+                , response: {
+                    statusCode: 200
+                }
+                , cols: [[
+                    {
+                        type: 'checkbox', fixed: 'left'
+                    }
+                    , {
+                        field: 'voucher', title: '优惠卷', templet: function (item) {
+                            return '<span class="badge badge-info">' + item.voucher + '</span>';
+                        }
+                    }
+                    , {
+                        field: 'money', title: '金额', templet: function (item) {
+                            return '<span class="badge badge-success">' + item.money + '</span>';
+                        }
+                    }
+                    , {
+                        field: 'commodity_id', title: '所属商品', templet: function (item) {
+                            if (item.commodity == null) {
+                                return '-';
+                            }
+                            return '<span class="badge badge-primary">' + item.commodity.name + '</span>';
+                        }, width: 400
+                    }
+                    , {field: 'create_date', title: '生成时间'}
+                    , {
+                        field: 'expire_date', title: '到期时间', templet: function (item) {
+                            if (item.expire_date == null) {
+                                return '-';
+                            }
+                            return item.expire_date;
+                        }
+                    }
+                    , {
+                        field: 'status', title: '优惠卷状态', templet: function (item) {
+                            return status[item.status];
+                        }
+                    }, {
+                        field: 'contact', title: '使用者', templet: function (item) {
+                            if (item.contact == null) {
+                                return '-';
+                            }
+                            return item.contact;
+                        }
+                    }
+                ]],
+                done: res => {
+                }
+            });
+
+            let modal = (values = {}) => {
+                cao.popup('/admin/api/voucher/save', [
+                    {
+                        title: "选择商品",
+                        name: "commodity_id",
+                        type: "select",
+                        dict: "commodity,id,name",
+                        placeholder: "请选择商品"
+                    },
+                    {title: "抵扣金额", name: "money", type: "input", placeholder: "请输入该优惠卷能够抵扣的金额"},
+                    {title: "过期时间", name: "expire_date", type: "date", placeholder: "过了该时间优惠卷自动失效"},
+                    {title: "生成数量", name: "num", type: "input", placeholder: "本次生成多少张优惠卷"}
+                ], res => {
+                    tableInstance.reload();
+                }, values);
+            }
+
+            $('.btn-app-create').click(function () {
+                modal();
+            });
+
+            $('.btn-app-del').click(() => {
+                var data = cao.listObjectToArray(table.checkStatus('voucher').data);
+                if (data.length == 0) {
+                    layer.msg("请至少勾选1个优惠卷进行操作！");
+                    return;
+                }
+                layer.confirm('您确定要删除已经选中的优惠卷吗？这是不可恢复的操作！', {
+                    btn: ['确定', '取消']
+                }, function () {
+                    $.post("/admin/api/voucher/del", {list: data}, res => {
+                        layer.msg(res.msg);
+                        tableInstance.reload();
+                    });
+                });
+            });
+
+            $('.export').click(function () {
+                let query = $('.search-query').serialize();
+                window.open('/admin/api/voucher/export?' + query);
+            });
+
+            cao.query('.search-query', tableInstance, [
+                {title: "优惠卷", name: "equal-voucher", type: "input", width: 160},
+                {
+                    title: "选择商品",
+                    name: "equal-commodity_id",
+                    type: "select",
+                    dict: "commodity,id,name",
+                    width: 160,
+                    search: true
+                },
+                {
+                    title: "使用状态", name: "equal-status", type: "select", dict: [
+                        {id: 0, name: "未使用"},
+                        {id: 1, name: "已使用"},
+                    ], width: 160
+                },
+                {title: "开始时间", name: "betweenStart-create_date", type: "date", width: 160},
+                {title: "结束时间", name: "betweenEnd-create_date", type: "date", width: 160},
+                {title: "联系方式", name: "equal-contact", type: "input", width: 160},
+            ], true, false);
+        });
+    });
+</script>
+
+#{include file="./footer.html"}

@@ -1,0 +1,203 @@
+#{include file="./header.html"}
+<style>
+    .hr-top {
+        margin-bottom: 10px;
+        border-bottom: 1px dashed #e5e5e5;
+        position: relative;
+        padding-bottom: 5px;
+    }
+</style>
+
+<div id="main-content">
+
+    <div class="container-fluid" style="margin-top: 20px">
+
+        <div class="row clearfix">
+
+            <div class="col-lg-2 col-md-2">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <div class="icon-in-bg bg-pink text-white rounded-circle"><i class="fa icon-basket"></i>
+                            </div>
+                            <div class="ml-4">
+                                <span>今日盈利</span>
+                                <h3 class="mb-0 font-weight-medium">#{$data.todaySuccessAmount}</h3>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-2 col-md-2">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <div class="icon-in-bg bg-pink text-white rounded-circle"><i class="fa icon-basket"></i>
+                            </div>
+                            <div class="ml-4">
+                                <span>今日售卡</span>
+                                <h3 class="mb-0 font-weight-medium">#{$data.todaySuccessCard}</h3>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-2 col-md-2">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <div class="icon-in-bg bg-pink text-white rounded-circle"><i class="fa icon-basket"></i>
+                            </div>
+                            <div class="ml-4">
+                                <span>昨日盈利</span>
+                                <h3 class="mb-0 font-weight-medium">#{$data.yesterdaySuccessAmount}</h3>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-2 col-md-2">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <div class="icon-in-bg bg-pink text-white rounded-circle"><i class="fa icon-basket"></i>
+                            </div>
+                            <div class="ml-4">
+                                <span>昨日售卡</span>
+                                <h3 class="mb-0 font-weight-medium">#{$data.yesterdaySuccessCard}</h3>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-2 col-md-2">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <div class="icon-in-bg bg-pink text-white rounded-circle"><i class="fa icon-basket"></i>
+                            </div>
+                            <div class="ml-4">
+                                <span>总盈利</span>
+                                <h3 class="mb-0 font-weight-medium">#{$data.allSuccessAmount}</h3>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-2 col-md-2">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <div class="icon-in-bg bg-pink text-white rounded-circle"><i class="fa icon-basket"></i>
+                            </div>
+                            <div class="ml-4">
+                                <span>总售卡</span>
+                                <h3 class="mb-0 font-weight-medium">#{$data.allSuccessCard}</h3>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+
+    </div>
+
+    <div class="container-fluid">
+
+        <div class="row clearfix">
+
+            <div class="col-lg-12 col-md-12">
+                <div class="card">
+                    <div class="header">
+                        <h2>您正在使用的是荔枝发卡系统v#{LIZHI_VERSION} <span class="newVersionView" style="display: none;">(<b
+                                style="color: red;"> 有新版本:v<span class="newVersion"></span></b> - <span
+                                class="newVersionDate"></span> - <b
+                                class="updateBtn" style="cursor:pointer;color: #007bff;">立即更新</b> )</span>
+
+                        </h2>
+                    </div>
+                    <div class="body">
+                        <ul class="nav nav-tabs">
+                            <li class="nav-item"><a class="nav-link  active show" data-toggle="tab"
+                                                    href="#Version">版本更新<span class="versionView"></span></a></li>
+                            <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#Desc">重要说明</a></li>
+                        </ul>
+                        <div class="tab-content">
+                            <div class="tab-pane vivify fadeIn show active" id="Version">
+                                <div class="hr-top"><b style="color: red;font-size: 16px;">v1.0 - 2020/07/17</b>
+                                    <p>这是荔枝发卡系统诞生的日子，经历了无数天的打磨，它来了。</p>
+                                </div>
+
+                            </div>
+
+                            <div class="tab-pane vivify fadeIn" id="Desc">
+                                <p style="color: #00b0ff;font-size: 14px;">
+                                    本程序为完全开源程序，无任何版权限制您可以没有任何限制使用本程序，比如：二次开发但是，由于本程序搭建后的事情不受作者管制，所以造成的一切法律问题，请自行承担，与作者无任何关系.
+                                </p>
+
+                                <p style="margin-top: 20px;"> <small>Tips：如果您有好的建议以及功能，可以反馈给作者，如果判定您的意见合理，会尽快发起软件更新，届时，您只需要在后台进行在线更新即可！</small></p>
+
+                                <p style="margin-top: 20px;"><small>QQ交流群：1142236180</small></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+</div>
+
+<script>
+    let versionInfo;
+    $.post('/admin/api/version/getVersion', res => {
+        versionInfo = res.data;
+
+        $('.versionView').html('v'+res.data.version);
+        //如果不相等,等于有新版本咯
+        if (res.data.localVersion != res.data.version) {
+            $('.newVersionView').show();
+            $('.newVersion').html(res.data.version);
+            $('.newVersionDate').html(res.data.date);
+        }
+    });
+
+    $(function () {
+        layui.use(['layer'], function () {
+            $('.updateBtn').click(function () {
+                if (versionInfo.localVersion == versionInfo.version) {
+                    layer.msg("您已经是最新版了，无需更新！");
+                    return;
+                }
+
+                layer.confirm(versionInfo.content, {
+                    btn: ['立即更新', '取消更新'] //按钮
+                }, function () {
+                    //更新新版本
+                    let layIndex = layer.load(1, {
+                        shade: [0.3, '#fff'] //0.1透明度的白色背景
+                    });
+                    $.post('/admin/api/version/update', res => {
+                        layer.close(layIndex);
+                        layer.msg(res.msg);
+                        if (res.code == 200) {
+                            setTimeout(() => {
+                                window.location.reload();
+                            }, 500);
+                        }
+                    });
+                });
+
+            });
+        });
+    });
+</script>
+
+#{include file="./footer.html"}

@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <title>#{$title} - #{$site.title}</title>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, initial-scale=1, shrink-to-fit=no">
+    <meta name="description"
+          content="Brego Bootstrap 4x admin is super flexible, powerful, clean &amp; modern responsive admin dashboard with unlimited possibilities.">
+    <meta name="author" content="GetBootstrap, design by: puffintheme.com">
+
+    <link rel="icon" href="/favicon.ico" type="image/x-icon"/>
+    <!-- VENDOR CSS -->
+    <link rel="stylesheet" href="/assets/admin/assets/vendor/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/assets/admin/assets/fonts/font-awesome-4.7.0/css/font-awesome.css">
+
+
+    <link rel="stylesheet" href="/assets/admin/assets/vendor/animate-css/vivify.min.css">
+
+    <link rel="stylesheet" href="/assets/admin/assets/vendor/c3/c3.min.css"/>
+    <link rel="stylesheet" href="/assets/admin/assets/vendor/chartist/css/chartist.css">
+    <link rel="stylesheet" href="/assets/admin/assets/vendor/chartist-plugin-tooltip/chartist-plugin-tooltip.css">
+    <link rel="stylesheet" href="/assets/admin/assets/vendor/toastr/toastr.min.css">
+    <link rel="stylesheet" href="/assets/admin/assets/vendor/jvectormap/jquery-jvectormap-2.0.3.css"/>
+
+    <!-- MAIN CSS -->
+    <link rel="stylesheet" href="/assets/admin/assets/css/site.css">
+
+    <!--layui-->
+    <link rel="stylesheet" href="/assets/static/layui/css/layui.css">
+
+
+    <script src="/assets/static/jquery.min.js"></script>
+
+    <style>
+        *, html {
+            font-family: 微软雅黑, serif;
+        }
+    </style>
+
+    <script>
+        $(function () {
+            layui.config({
+                base: '/assets/admin/'
+            });
+        });
+    </script>
+</head>
+<body class="theme-blush"
+      style="background:url('#{$site.backgroundUrl}') fixed no-repeat !important;background-size: cover;">
+<!-- Page Loader -->
+<div class="page-loader-wrapper">
+    <div class="loader">
+        <div class="m-t-30"><img src="/favicon.ico" width="40" height="40" alt="Brego"></div>
+        <p>请稍等，正在为您加载...</p>
+    </div>
+</div>
+
+
+<!-- Overlay For Sidebars -->
+<div class="overlay"></div>
+
+<div id="wrapper">
+
+
+    <nav class="navbar navbar-fixed-top">
+        <div class="container-fluid">
+
+            <div class="navbar-left">
+                <div class="navbar-btn">
+                    <a href="index.html"><img src="/favicon.ico" alt="Brego Logo" class="img-fluid logo"></a>
+                    <button type="button" class="btn-toggle-offcanvas"><i class="lnr lnr-menu fa fa-bars"></i></button>
+                </div>
+                <form id="navbar-search" class="navbar-form search-form" action="/admin/index/order">
+                    <input name="tradeNo" class="form-control" placeholder="请输入订单号进行查询" type="text">
+                    <button type="button" class="btn btn-default"><i class="icon-magnifier"></i></button>
+                </form>
+            </div>
+
+            <div class="navbar-right">
+                <div id="navbar-menu">
+                    <ul class="nav navbar-nav">
+                        <li><a title="注销登录" href="/admin/api/personal/logout" class="icon-menu"><i
+                                class="icon-power"></i></a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div id="left-sidebar" class="sidebar">
+        <div class="navbar-brand">
+            <a><img src="/favicon.ico" alt="Brego Logo"
+                    class="img-fluid logo"><span>#{$site.title}</span></a>
+            <button type="button" class="btn-toggle-offcanvas btn btn-sm float-right"><i
+                    class="lnr lnr-menu fa fa-chevron-circle-left"></i></button>
+        </div>
+        <div class="sidebar-scroll">
+            <div class="user-account">
+                <div class="user_div">
+                    <img src="#{$user.face}" class="user-photo face-img" alt="#{$user.nick}"
+                         style="border-radius: 50%;border: 1px solid #80808047;box-shadow: 3px 3px 3px #888888;">
+                </div>
+                <div class="dropdown">
+
+                    <a href="javascript:void(0);" class="dropdown-toggle user-name" data-toggle="dropdown"><strong>#{$user.nick}</strong></a>
+                    <ul class="dropdown-menu dropdown-menu-right account vivify flipInY"
+                        style="background-color: rgba(249, 249, 249, 0.59);">
+                        <li><a href="/admin/index/personal"><i class="icon-user"></i>我的资料</a></li>
+                        <li class="divider"></li>
+                        <li><a href="/admin/api/personal/logout"><i class="icon-power"></i>安全注销</a></li>
+                    </ul>
+                    <small style="position: relative;top: 5px;">欢迎回来，欧尼酱~</small>
+
+                </div>
+            </div>
+            <nav id="left-sidebar-nav" class="sidebar-nav">
+                <ul id="main-menu" class="metismenu">
+                    <li class="header">Main</li>
+                    <li class="#{if $title == '控制台'}active#{/if}"><a href="/admin/index/home"><i
+                            class="icon-speedometer"></i><span>控制台</span></a></li>
+
+                    <li class="header">Trade</li>
+                    <li class="#{if $title == '商品分类'}active#{/if}"><a href="/admin/index/category"><i
+                            class="fa icon-star"></i><span>商品分类</span></a></li>
+                    <li class="#{if $title == '商品管理'}active#{/if}"><a href="/admin/index/commodity"><i
+                            class="fa icon-basket"></i><span>商品管理</span></a></li>
+                    <li class="#{if $title == '卡密管理'}active#{/if}"><a href="/admin/index/card"><i
+                            class="fa icon-game-controller"></i><span>卡密管理</span></a></li>
+                    <li class="#{if $title == '优惠卷'}active#{/if}"><a href="/admin/index/voucher"><i
+                            class="fa icon-present"></i><span>优惠卷</span></a></li>
+
+                    <li class="header">Pay</li>
+                    <li class="#{if $title == '订单记录'}active#{/if}"><a href="/admin/index/order"><i
+                            class="fa icon-social-dropbox"></i><span>订单记录</span></a></li>
+                    <li class="#{if $title == '支付配置'}active#{/if}"><a href="/admin/index/payConfig"><i
+                            class="fa icon-puzzle"></i><span>支付配置</span></a></li>
+                    <li class="#{if $title == '支付方式'}active#{/if}"><a href="/admin/index/pay"><i
+                            class="fa icon-social-twitter"></i><span>支付方式</span></a></li>
+                    <li class="header">Config</li>
+                    <li class="#{if $title == '网站配置'}active#{/if}"><a href="/admin/index/config"><i
+                            class="fa icon-social-twitter"></i><span>网站配置</span></a></li>
+                </ul>
+            </nav>
+        </div>
+    </div>

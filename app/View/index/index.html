@@ -1,0 +1,261 @@
+#{include file="./header.html"}
+
+<div class="content-wrapper">
+    <div class="container">
+        <!--            网站联系部分-->
+        <div class="card">
+            <div class="card-body">
+                <div class="card-block">
+                    <div class="row">
+                        <div class="col">
+                            <p class="card-title" style="margin: 0;">店铺名称: <span>#{$site.title}</span></p>
+                            <p class="card-title" style="margin: 0;">商家ＱＱ: <span>#{$user.qq}</span><i
+                                    class="icon-qq iconfont"></i></p>
+                        </div>
+                        <div class="col text-right">
+                            <a class="btn btn-success btn-sm btn-round"
+                               href="http://wpa.qq.com/msgrd?v=1&uin=#{$user.qq}" target="_blank">帮助</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <!--            公告部分-->
+        <div class="card">
+            <div class="card-header">
+                <p class="card-title">公告</p>
+            </div>
+            <div class="card-block">
+                #{$site.notice}
+            </div>
+        </div>
+
+
+        <!--            选择商品部分-->
+        <div class="card">
+            <div class="card-header">
+                <p class="card-title">购买</p>
+            </div>
+            <div class="card-block">
+                <fieldset class="form-group">
+                    <label for="type" style="font-size: 14px;">请选择商品分类</label>
+                    <div id="type">
+                        #{foreach $category as $cate}
+                        <span class="button-click" onclick="categoryClick(this,'#{$cate.id}')" #{if
+                              $cate.commodity_count== 0}style="background-color: #ced4dadb;opacity: 0.6;" #{/if}>#{$cate.name}</span>
+                        #{/foreach}
+                    </div>
+                </fieldset>
+
+                <fieldset class="form-group product" style="display: none;">
+                    <label for="product" style="font-size: 14px;">请选择商品</label>
+                    <div id="product"></div>
+                </fieldset>
+            </div>
+        </div>
+
+        <!--            商品简介部分-->
+        <div class="card animated fadeInLeft shopInfoHtml" style="display: none;"></div>
+
+
+        <!--            付款部分-->
+        <div class="card animated fadeInLeft" style="display: none;">
+            <div class="card-header">
+                <p class="card-title">付款方式:</p>
+            </div>
+            <div class="card-block">
+                <div class="row" style="margin-left: 0px;">
+                    #{foreach $pay as $p}
+                    <span class="button-click" onclick="Buy('#{$p.id}')" style="line-height: 22px;"> <img
+                            src="#{$p.face}" style="width: 16px;"> #{$p.name}</span>
+                    #{/foreach}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+
+<script>
+    let map = [];
+    let ws = [];
+    let commodityId = 0;
+    let price = 0;
+    let orderPrice = 0;
+
+    let shopInfoHtml = '<div class="card-header">\n' +
+        '                <p class="card-title">商品信息:</p>\n' +
+        '            </div>\n' +
+        '            <div class="card-block">\n' +
+        '                <div class="row">\n' +
+        '                    <div class="col-md-5 description"></div>\n' +
+        '                    <div class="col-md-7">\n' +
+        '                        <h4 class="productName" style="margin-bottom: 20px;"></h4>\n' +
+        '                        <p>商品单价： <span class="text-success price"\n' +
+        '                                       style="font-weight: bolder;font-size: 18px"></span>\n' +
+        '                        </p>\n' +
+        '                        <p>发货方式： <span class="badge badge-pill badge-success text-white">自动发货</span></p>\n' +
+        '                        <fieldset class="form-group">\n' +
+        '                            <label style="display: inline-block;">联系方式：</label>\n' +
+        '                            <input class="form-control round contact" placeholder="">\n' +
+        '                        </fieldset>\n' +
+        '\n' +
+        '                        #{if $site.pass == 1}\n' +
+        '                        <fieldset class="form-group">\n' +
+        '                            <label style="display: inline-block;">查询密码：</label>\n' +
+        '                            <input class="form-control round pass" placeholder="查询订单时的密码..">\n' +
+        '                        </fieldset>\n' +
+        '                        #{/if}\n' +
+        '\n' +
+        '                        <fieldset class="form-group voucher-view" style="display: none;">\n' +
+        '                            <label style="display: inline-block;">&nbsp;&nbsp;&nbsp;&nbsp;优惠卷：</label>\n' +
+        '                            <input class="form-control round voucher" placeholder="如果您有优惠卷可以填写优惠卷，没有可不填写">\n' +
+        '                        </fieldset>\n' +
+        '\n' +
+        '                        <fieldset class="form-group">\n' +
+        '                            <label>购买数量：</label>\n' +
+        '                            <input class="form-control round buyNum" type="number" style="width: 10%;" value="1">\n' +
+        '                            <span style="margin-left: 10px;"> 剩余库存: <span\n' +
+        '                                    class="badge badge-pill badge-success text-white card_count"></span></span>\n' +
+        '                        </fieldset>\n' +
+        '\n' +
+        '                        <fieldset class="form-group wholesale" style="display: none;">\n' +
+        '                            <label style="color: #007bff;font-size: 14px;">批发优惠已开放</label>\n' +
+        '                            <div style="font-size: 12px;color: red;" class="wholesaleHtml">\n' +
+        '                            </div>\n' +
+        '                        </fieldset>\n' +
+        '                    </div>\n' +
+        '                </div>\n' +
+        '            </div>';
+
+    let switchElement = function (obj) {
+        $('.checked').removeClass('checked');
+        $(obj).addClass('checked');
+    };
+
+    let categoryClick = function (obj, cateId) {
+        switchElement(obj);
+        $('.fadeInLeft').hide();
+        $('.product').hide();
+        let layIndex = layer.load(1, {
+            shade: [0.3, '#fff'] //0.1透明度的白色背景
+        });
+        $.post('/index/api/shop/getCommodity', {categoryId: cateId}, res => {
+            layer.close(layIndex);
+            $('#product').html('');
+            if (res.data.length == 0) {
+                layer.msg("该分类下没有商品");
+                return;
+            }
+            $('.product').show(150);
+            res.data.forEach(item => {
+                map[item.id] = item;
+                $('#product').append('<span class="button-click" onclick="commodityClick(this,' + item.id + ')" ' + (item.card_count == 0 ? 'style="background-color: #ced4dadb;opacity: 0.6;"' : '') + '>' + item.name + '</span>');
+            });
+        });
+    };
+
+    function sort(money, buyNum) {
+        let b = [];
+        ws.forEach((item, key) => {
+            b.push(key)
+        });
+        let g = b.sort(function (a, b) {
+            return b - a;
+        });
+
+        for (var i = 0; i < g.length; i++) {
+            if (buyNum >= g[i]) {
+                money = ws[g[i]];
+                break;
+            }
+        }
+
+        if (money != price) {
+            $('.price').html("¥" + money + " (<small style='color: red;'>已自动减价</small>)");
+        } else {
+            $('.price').html("¥" + money);
+        }
+        orderPrice = money;
+    }
+
+    $('.buyNum').change(function () {
+        let money = price;
+        let buyNum = parseInt($('.buyNum').val());
+        sort(money, buyNum);
+    });
+
+
+    let commodityClick = function (obj, id) {
+        $('.fadeInLeft').hide();
+        $('.shopInfoHtml').html(shopInfoHtml);
+        commodityId = id;
+        switchElement(obj);
+        let info = map[id];
+        $('.description').html(info.desc.replace(/\n/g, "<br>"));
+        $('.productName').html(info.name);
+        $('.price').html("¥" + info.price);
+        orderPrice = info.price;
+        price = info.price;
+        $('.contact').attr("placeholder", info.contact_tips);
+        $('.card_count').html(info.card_count);
+        if (info.voucher_status == 1) {
+            $('.voucher-view').show();
+        }
+
+        if (info.wholesale_status == 1) {
+            let list = info.wholesale.trim().split("\n");
+            list.forEach(item => {
+                let s = item.split('-');
+                if (s.length == 2) {
+                    ws[s[0]] = s[1];
+                }
+            });
+            let x = '';
+            ws.forEach((money, num) => {
+                x += '<div>一次性购买' + num + '张，单价自动调整为：<b>' + money + '</b>元</div>';
+            });
+            if (ws.length > 0) {
+                $('.wholesale').show();
+                $('.wholesaleHtml').html(x);
+            }
+        }
+        $('.fadeInLeft').show(150);
+    };
+
+    let Buy = function (payId) {
+        var mapElement = map[commodityId];
+        let buyNum = $('.buyNum').val();
+        layer.confirm('您购买的商品是<b style="color: #0ace36;">' + mapElement.name + '</b>，单价为：<b style="color: red;">' + orderPrice + '</b>元，购买数量：<b style="color: blue;">' + buyNum + '</b>，请确认是否要继续购买？', {
+            btn: ['<span style="color: white;">确认</span>', '取消'] //按钮
+        }, function () {
+            let layIndex = layer.load(1, {
+                shade: [0.3, '#fff'] //0.1透明度的白色背景
+            });
+            $.post('/index/api/order/trade', {
+                contact: $('.contact').val(),
+                num: buyNum,
+                pass: $('.pass').val(),
+                payId: payId,
+                device: pay.device(),
+                voucher: $('.voucher').val(),
+                commodityId: commodityId
+            }, res => {
+                layer.close(layIndex);
+                if (res.code == 200) {
+                    if (res.data.amount == 0) {
+                        window.location.href = '/index/query?tradeNo=' + res.data.tradeNo;
+                    } else {
+                        window.location.href = res.data.url;
+                    }
+                } else {
+                    layer.msg(res.msg);
+                }
+            });
+        });
+    }
+</script>
+</body>
+</html>

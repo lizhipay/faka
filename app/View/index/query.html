@@ -1,0 +1,107 @@
+#{include file="./header.html"}
+
+<div class="content-wrapper">
+    <div class="container">
+
+        <div class="card">
+            <div class="card-header">
+                <p class="card-title">查询订单</p>
+            </div>
+            <div class="card-block" style="padding-top: 10px;padding-bottom: 10px">
+                <fieldset>
+                    <div class="input-group">
+                        <input type="text" class="form-control keywords" placeholder="请输入联系方式或订单号进行查询"
+                               value="#{$tradeNo}">
+                        <div class="input-group-append">
+                            <button class="btn btn-success queryBtn">查询</button>
+                        </div>
+                    </div>
+                </fieldset>
+            </div>
+        </div>
+        <div class="card queryView" style="display: none;">
+            <div class="card-header">
+                <p class="card-title">查询结果</p>
+            </div>
+            <div class="card-block" style="margin-top: 10px;">
+                <h1 class="text-center notfound" style="display: none;">未查询到相关订单</h1>
+
+                <div class="order-success" style="display: none;">
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+
+<script>
+    let keywordsIns = $('.keywords');
+
+    $('.queryBtn').click(function () {
+        let orderSuccess = $('.order-success');
+        $('.notfound').hide();
+        orderSuccess.hide();
+        orderSuccess.html('');
+        $('.payDateView').hide();
+        $('.queryView').show();
+
+
+        $.post('/index/api/order/query', {keywords: keywordsIns.val()}, res => {
+            if (res.code == 200) {
+                localStorage.setItem('keywords', keywordsIns.val());
+                res.data.forEach(order => {
+                    let status = '<span style="color: red;">未支付</span>';
+
+                    if (order.status == 1) {
+                        status = '<span style="color: green;">已支付</span>';
+                    }
+
+                    let html = '<div class="hr-top">\n' +
+                        '                        <div style="font-size: 14px;">订单号：<b class="trade_no">' + order.trade_no + '</b></div>\n' +
+                        '                        <div style="font-size: 14px;">下单金额：<b style="color: red;" class="amount">' + order.amount + '</b></div>\n' +
+                        '                        <div style="font-size: 14px;">购买数量：<b style="color: blue;" class="buyNum">' + order.num + '</b></div>\n' +
+                        '                        <div style="font-size: 14px;">下单时间：<b class="create_date">' + order.create_date + '</b></div>\n' +
+                        '                        <div style="font-size: 14px;">商品名称：<b class="create_date">' + order.commodity.name + '</b></div>\n' +
+                        '                        <div style="font-size: 14px;">支付方式：<b class="create_date">' + order.pay.name + '</b></div>\n' +
+                        '                        <div style="font-size: 14px;">订单状态：<b class="status">' + status + '</b></div>\n' +
+                        '                        <div style="font-size: 14px;' + (order.status == 1 ? '' : 'display: none;') + '" class="payDateView">支付时间：<b class="pay_date"\n' +
+                        '                                                                                                style="color: green;">' + order.pay_date + '</b>\n' +
+                        '                        </div>\n' +
+                        '                        <div style="font-size: 14px;">卡密信息：<input style="height: 18px;width:130px;display: none;"  type="password" placeholder="请输入查询密码.." class="passId-' + order.id + '"> <b style="cursor:pointer;color: blue;" class="getCard" data-id="' + order.id + '">查看</b></div>\n' +
+                        '                        <div style="margin-top: 10px; display: none;" class="cardInfoView-' + order.id + '">\n' +
+                        '                            <textarea class="form-control cardInfo-' + order.id + '" style="height: 420px;"></textarea>\n' +
+                        '                        </div>\n' +
+                        '                    </div>';
+
+                    orderSuccess.append(html);
+                });
+
+                $('.getCard').click(function () {
+                    let orderId = $(this).attr('data-id');
+                    $.post('/index/api/order/getCard', {orderId: orderId, pass: $('.passId-' + orderId).val()}, res => {
+                        if (res.code == 200) {
+                            $('.cardInfo-' + orderId).html(res.data.card);
+                            $('.cardInfoView-' + orderId).show(80);
+                        } else if (res.code == -7) {
+                            layer.msg(res.msg);
+                            $('.passId-' + orderId).show(120);
+                        } else {
+                            layer.msg(res.msg);
+                        }
+                    });
+                });
+
+                orderSuccess.show();
+            } else {
+                $('.notfound').show();
+            }
+        });
+    });
+
+    #{if $tradeNo != ''}
+        $('.queryBtn').click();
+    #{/if}
+</script>
+</body>
+</html>

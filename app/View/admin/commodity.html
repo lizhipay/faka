@@ -1,0 +1,230 @@
+#{include file="./header.html"}
+<div id="main-content">
+
+    <div class="container-fluid" style="margin-top: 20px">
+        <div class="row clearfix">
+
+            <div class="col-xl-12 col-lg-12 col-md-12">
+                <div class="card">
+                    <div class="header">
+                        <h2>商品管理</h2>
+                    </div>
+                    <div class="body">
+                        <button type="button" class="btn btn-acg mb-2 btn-app-create"><i
+                                class="fa fa-plus-square"></i>
+                            <span>添加商品</span></button>
+
+                        <button type="button" class="btn btn-acg mb-2 btn-app-del"><i
+                                class="fa  icon-trash"></i>
+                            <span>移除选中</span></button>
+                        <form class="search-query"></form>
+                        <table id="commodity" lay-filter="commodity"></table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+
+    $(function () {
+        layui.use(['table', 'hex'], function () {
+            let table = layui.table;
+            var cao = layui.hex;
+
+            let contact = ['任意', '手机', '邮箱', 'QQ号'];
+
+            var tableInstance = table.render({
+                elem: '#commodity'
+                , skin: 'nob'
+                , size: 'lg'
+                , height: 650
+                , limit: 11
+                , limits: [11, 20, 30, 50]
+                , url: '/admin/api/commodity/data'
+                , page: true
+                , method: "post"
+                , response: {
+                    statusCode: 200
+                }
+                , cols: [[
+                    {
+                        type: 'checkbox', fixed: 'left'
+                    }
+                    , {field: 'name', title: '商品名称'}
+                    , {field: 'price', title: '单价'}
+                    , {field: 'card_count', title: '库存卡密'}
+                    , {field: 'card_success_count', title: '已售卡密'}
+                    , {
+                        field: 'category', title: '所属分类', templet: function (item) {
+                            if (item.category == null) {
+                                return '-';
+                            }
+
+                            return item.category.name;
+                        }
+                    }
+                    , {
+                        field: 'wholesale_status', title: '批发状态', templet: function (item) {
+                            if (item.wholesale_status == 1) {
+                                return '<span class="badge badge-success">启用</span>';
+                            }
+                            return '<span class="badge badge-default">停用</span>';
+                        }
+                    }
+                    , {
+                        field: 'voucher_status', title: '优惠卷', templet: function (item) {
+                            if (item.voucher_status == 1) {
+                                return '<span class="badge badge-success">启用</span>';
+                            }
+                            return '<span class="badge badge-default">停用</span>';
+                        }
+                    }
+                    , {
+                        field: 'contact', title: '联系方式', templet: function (item) {
+                            return contact[item.contact];
+                        }
+                    }
+                    , {
+                        field: 'status', title: '商品状态', templet: function (item) {
+                            if (item.status == 1) {
+                                return '<span class="badge badge-success">销售中</span>';
+                            }
+                            return '<span class="badge badge-default">已停售</span>';
+                        }
+                    }
+                    , {field: 'sort', title: '商品排序'}
+                    , {
+                        templet: function (item) {
+                            let html = '<button type="button" data-id="' + item.id + '" class="btn btn-info layui-btn-xs edit"><i class="fa fa-edit"></i>修改</button> ';
+                            if (item.status == 0) {
+                                html += '<button type="button" data-id="' + item.id + '" class="btn btn-success layui-btn-xs start"><i class="fa fa-play"></i> 开售</button> ';
+                            } else {
+                                html += '<button type="button" data-id="' + item.id + '" class="btn btn-danger layui-btn-xs stop"><i class="fa fa-pause"></i> 停售</button> ';
+                            }
+                            html += '<button type="button" data-id="' + item.id + '" class="btn btn-danger layui-btn-xs del"><i class="fa fa-trash-o"></i> 移除</button> ';
+                            return html;
+                        }, width: 220
+                    }
+                ]],
+                done: res => {
+                    cao.setIdMap(res.data);
+
+                    $('.edit').click(function () {
+                        let mapItem = cao.getMapItem(this);
+                        modal(mapItem);
+                    });
+
+                    $('.del').click(function () {
+                        let id = cao.getObjectId(this);
+                        console.log(id)
+                        layer.confirm('您正在移除该商品，是否要继续？', {
+                            btn: ['确认移除', '取消']
+                        }, function () {
+                            $.post('/admin/api/commodity/del', {list: [id]}, res => {
+                                layer.msg(res.msg);
+                                tableInstance.reload();
+                            });
+                        });
+                    });
+
+                    $('.start').click(function () {
+                        let id = cao.getObjectId(this);
+                        $.post('/admin/api/commodity/save', {id: id, status: 1}, res => {
+                            layer.msg(res.msg);
+                            tableInstance.reload();
+                        });
+                    });
+
+                    $('.stop').click(function () {
+                        let id = cao.getObjectId(this);
+                        $.post('/admin/api/commodity/save', {id: id, status: 0}, res => {
+                            layer.msg(res.msg);
+                            tableInstance.reload();
+                        });
+                    });
+                }
+            });
+
+            let modal = (values = {}) => {
+                cao.popup('/admin/api/commodity/save', [
+                    {
+                        title: "选择分类",
+                        name: "category_id",
+                        type: "select",
+                        dict: "category,id,name",
+                        placeholder: "请选择商品分类"
+                    },
+                    {title: "商品名称", name: "name", type: "input", placeholder: "请输入商品名称"},
+                    {title: "商品单价", name: "price", type: "input", placeholder: "单价，如果想免费不需要购买请填写0"},
+                    {title: "商品介绍", name: "desc", type: "textarea", placeholder: "请注意（支持HTML/CSS所有语法），显示在前台给客户介绍的哦~"},
+                    {title: "开启批发", name: "wholesale_status", type: "switch", text: "启用"},
+                    {title: "批发配置", name: "wholesale", type: "textarea", placeholder: "数量-单价(如：100-9.99)，一行一个，顺序可随意"},
+                    {
+                        title: "联系方式", name: "contact", type: "select", dict: [
+                            {id: 0, name: "任意"},
+                            {id: 1, name: "手机"},
+                            {id: 2, name: "邮箱"},
+                            {id: 3, name: "QQ号"},
+                        ], placeholder: "请选择用户填写的联系方式类"
+                    },
+                    {title: "提示信息", name: "contact_tips", type: "input", placeholder: "输入联系方式时的提示文字"},
+                    {title: "优惠卷", name: "voucher_status", type: "switch", text: "启用"},
+                    {title: "商品排序", name: "sort", type: "input", placeholder: "值越小，排名越靠前哦~"},
+                    {title: "状态", name: "status", type: "switch", text: "启用"},
+                ], res => {
+                    tableInstance.reload();
+                }, values);
+            }
+
+            $('.btn-app-create').click(function () {
+                modal();
+            });
+
+            $('.btn-app-del').click(() => {
+                var data = cao.listObjectToArray(table.checkStatus('commodity').data);
+                if (data.length == 0) {
+                    layer.msg("请至少勾选1个商品进行操作！");
+                    return;
+                }
+
+                layer.confirm('您确定要删除已经选中的商品吗？这是不可恢复的操作！', {
+                    btn: ['确定', '取消']
+                }, function () {
+                    $.post("/admin/api/commodity/del", {list: data}, res => {
+                        layer.msg(res.msg);
+                        tableInstance.reload();
+                    });
+                });
+            });
+
+            cao.query('.search-query', tableInstance, [
+                {title: "商品名称关键词", name: "search-name", type: "input", width: 160},
+                {
+                    title: "选择商品分类",
+                    name: "equal-category_id",
+                    type: "select",
+                    dict: "category,id,name",
+                    width: 160,
+                    search: true
+                },
+                {
+                    title: "批发状态", name: "equal-wholesale_status", type: "select", dict: [
+                        {id: 0, name: "关闭"},
+                        {id: 1, name: "开启"},
+                    ], width: 160
+                },
+                {
+                    title: "商品状态", name: "equal-status", type: "select", dict: [
+                        {id: 0, name: "停售"},
+                        {id: 1, name: "销售中"},
+                    ], width: 160
+                }
+            ], true, false);
+        });
+    });
+</script>
+
+#{include file="./footer.html"}

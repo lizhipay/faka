@@ -1,0 +1,63 @@
+#{include file="./header.html"}
+<div id="main-content">
+    <div class="container-fluid" style="margin-top: 20px">
+
+        <div class="row clearfix">
+
+            <div class="col-xl-12 col-lg-12 col-md-12">
+                <div class="card">
+                    <div class="header">
+                        <h2>支付配置（下面的资料信息，请在荔枝付官网：<a href="https://lizhifu.net" target="_blank"><b>https://lizhifu.net</b></a>
+                            注册账号然后获取，注册账号只需要几秒钟即可，不需要审核！）</h2>
+                    </div>
+                    <div class="body">
+                        <form id="data-form" method="post">
+
+                            <div class="form-group">
+                                <label>商户ID</label>
+                                <input type="text" name="merchant_id" class="form-control" value="#{$pay.merchant_id}" placeholder="请输入商户ID">
+                            </div>
+
+                            <div class="form-group">
+                                <label>应用ID</label>
+                                <input type="text" name="app_id" class="form-control" value="#{$pay.app_id}"  placeholder="请输入应用ID">
+                            </div>
+
+                            <div class="form-group">
+                                <label>商户密钥</label>
+                                <input type="text" name="key" class="form-control" value="#{$pay.key}"  placeholder="请输入商户密钥">
+                            </div>
+
+                            <div class="form-group">
+                                <label>下单限制(每个IP每分钟最多能够提交多少订单,0代表不限制)</label>
+                                <input type="text" name="ipMinute" class="form-control" value="#{$pay.ipMinute}">
+                            </div>
+
+                            <br>
+                            <button type="button" class="btn btn-primary edit">立即修改</button>
+                        </form>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    $(function () {
+        layui.use(['layer', 'form', 'hex'], function () {
+
+            let hex = layui.hex;
+
+            $('.edit').click(function () {
+                $.post('/admin/api/pay/editConfig', $('#data-form').serialize(), res => {
+                    layer.msg(res.msg);
+                });
+            });
+        });
+    });
+</script>
+
+#{include file="./footer.html"}
