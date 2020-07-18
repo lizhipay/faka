@@ -7,8 +7,8 @@
 </p>
 
 ## 快速体验
-- 后台演示：https://faka.demo.10.do/admin  账号：admin 密码：123456
-- 前台演示：https://faka.demo.10.do
+- 后台演示：[https://faka.demo.10.do/admin](https://faka.demo.10.do/admin)  账号：admin 密码：123456
+- 前台演示：[https://faka.demo.10.do](https://faka.demo.10.do)
 
 ## 关于荔枝发卡系统
 
