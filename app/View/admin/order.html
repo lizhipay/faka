@@ -44,17 +44,24 @@
                 '<span class="badge badge-success">已支付</span>',
             ];
 
+
             let order = {
                 data: {}
             };
 
             let modal = (values = {}) => {
                 cao.popup('/admin/api/order/save', [
-                    {title: "卡密列表", name: "commodity", type: "textarea", placeholder: "当前无卡密信息", height: 460}
+                    {title: "卡密列表", name: "commodity", type: "textarea", placeholder: "当前无卡密信息", height: 460},
+                    {name: "send", type: "hidden"},
                 ], res => {
                     tableInstance.reload();
                 }, values);
             }
+
+            let cardType = [
+                '<span class="badge badge-success">自动发货</span>',
+                '<span class="badge badge-danger">手动发货</span>',
+            ];
 
             var tableInstance = table.render({
                 elem: '#orders'
@@ -72,6 +79,22 @@
                 , cols: [[
                     {field: 'trade_no', title: '订单号'}
                     , {
+                        title: '购买商品', templet: function (item) {
+                            if (item.shop == null) {
+                                return '-';
+                            }
+                            return '<b style="color: red">' + item.shop.name + '</b>';
+                        }
+                    }
+                    , {
+                        title: '发货方式', templet: function (item) {
+                            if (item.shop == null) {
+                                return '-';
+                            }
+                            return cardType[item.shop.card_type];
+                        }
+                    }
+                    , {
                         field: 'amount', title: '下单金额', templet: function (item) {
                             if (item.amount == 0) {
                                 return '-';
@@ -87,6 +110,15 @@
                     , {
                         field: 'status', title: '订单状态', templet: function (item) {
                             return status[item.status];
+                        }
+                    }
+                    , {
+                        field: 'send', title: '发货状态', templet: function (item) {
+                            if (item.send == 1) {
+                                return '<span class="badge badge-success">已发货</span>';
+                            }
+
+                            return '<span class="badge badge-danger sendShop" style="cursor: pointer;" data-id="' + item.id + '">立即发货</span>';
                         }
                     }
                     , {
@@ -134,6 +166,13 @@
                         modal(mapItem);
                     });
 
+                    $('.sendShop').click(function () {
+                        let map = cao.getMapItem(this);
+                        map.commodity = "";
+                        map.send = 1;
+                        modal(map);
+                    });
+
                     $('.exts').click(function () {
                         let mapItem = cao.getMapItem(this);
 
@@ -141,7 +180,7 @@
 
                         exts.forEach(item => {
                             if (item.type == 'textarea') {
-                                info.push('<div class="hr-top"><b style="color: #ffffff;position: relative;top: -84px;">' + item.title + '：</b>' + '<textarea class="form-control" style="color:white;height: 100px;width:75%;display: inline-block;border: none;">' + item.value + '</textarea>'+ "</div>");
+                                info.push('<div class="hr-top"><b style="color: #ffffff;position: relative;top: -84px;">' + item.title + '：</b>' + '<textarea class="form-control" style="color:white;height: 100px;width:75%;display: inline-block;border: none;">' + item.value + '</textarea>' + "</div>");
                             } else {
                                 info.push('<div  class="hr-top"><b style="color: #ffffff;">' + item.title + '：</b>' + item.value + "</div>");
                             }

@@ -19,6 +19,7 @@ class ConfigController extends AdminApiBaseController
     /**
      * 设置资料
      * @return array
+     * @throws \Core\Exception\JSONException
      */
     public function edit(): array
     {
@@ -28,6 +29,17 @@ class ConfigController extends AdminApiBaseController
             @unlink(BASE_PATH . $file);
         }
         Bridge::setConfig('site', $_POST);
+        return $this->json(200, '修改成功');
+    }
+
+
+    /**
+     * @return array
+     * @throws \Core\Exception\JSONException
+     */
+    public function editEmail(): array
+    {
+        Bridge::setConfig('email', $_POST);
         return $this->json(200, '修改成功');
     }
 

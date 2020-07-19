@@ -22,6 +22,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property string $contact
  * @property int $voucher_id
  * @property int $num
+ * @property int $send
  */
 class Order extends Model
 {
@@ -38,7 +39,7 @@ class Order extends Model
     /**
      * @var array
      */
-    protected $casts = ['id' => 'integer', 'commodity_id' => 'integer', 'num' => 'integer', 'amount' => 'float', 'pay_id' => 'integer', 'status' => 'integer', 'voucher_id' => 'integer'];
+    protected $casts = ['id' => 'integer', 'commodity_id' => 'integer', 'send' => 'integer', 'num' => 'integer', 'amount' => 'float', 'pay_id' => 'integer', 'status' => 'integer', 'voucher_id' => 'integer'];
 
     //获取支付方式
     public function pay()
@@ -53,7 +54,7 @@ class Order extends Model
     }
 
     //获取商品
-    public function commodity()
+    public function shop()
     {
         return $this->hasOne(Commodity::class, 'id', 'commodity_id');
     }

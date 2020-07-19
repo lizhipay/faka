@@ -169,6 +169,12 @@
                     {title: "开启批发", name: "wholesale_status", type: "switch", text: "启用"},
                     {title: "批发配置", name: "wholesale", type: "textarea", placeholder: "数量-单价(如：100-9.99)，一行一个，顺序可随意"},
                     {
+                        title: "发卡方式", name: "card_type", type: "select", dict: [
+                            {id: 0, name: "自动发卡（需要上传卡密）"},
+                            {id: 1, name: "手动发卡（无需上传卡密）"}
+                        ], placeholder: "请选择用户填写的联系方式类", default: 0
+                    },
+                    {
                         title: "联系方式", name: "contact", type: "select", dict: [
                             {id: 0, name: "任意"},
                             {id: 1, name: "手机"},
@@ -176,6 +182,7 @@
                             {id: 3, name: "QQ号"},
                         ], placeholder: "请选择用户填写的联系方式类"
                     },
+                    {title: "邮件通知", name: "email_notification", type: "switch", text: "启用"},
                     {title: "提示信息", name: "contact_tips", type: "input", placeholder: "输入联系方式时的提示文字"},
                     {
                         title: "<a class='input-ext-tips' href='https://lizhime.com/97.html' target='_blank' style='color: red;z-index: 9999;'>扩展信息</a>",
@@ -189,7 +196,7 @@
                     {title: "状态", name: "status", type: "switch", text: "启用"},
                 ], res => {
                     tableInstance.reload();
-                }, values, ['660px', '720px'], false, "添加", function () {
+                }, values, ['660px', '620px'], false, "添加", function () {
                     let tipsView = $('.input-ext-tips');
                     tipsView.parent().css('height', "100px");
                 });

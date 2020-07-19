@@ -97,7 +97,7 @@
         '                        <p>商品单价： <span class="text-success price"\n' +
         '                                       style="font-weight: bolder;font-size: 18px"></span>\n' +
         '                        </p>\n' +
-        '                        <p>发货方式： <span class="badge badge-pill badge-success text-white">自动发货</span></p>\n' +
+        '                        <p>发货方式： <span class="badge badge-pill text-white cardType">...</span></p>\n' +
         '                        <fieldset class="form-group">\n' +
         '                            <label style="display: inline-block;">联系方式：</label>\n' +
         '                            <input class="form-control round contact" name="contact" placeholder="">\n' +
@@ -118,7 +118,7 @@
         '                        <fieldset class="form-group">\n' +
         '                            <label>购买数量：</label>\n' +
         '                            <input class="form-control round buyNum" name="num" type="number" style="width: 10%;" value="1">\n' +
-        '                            <span style="margin-left: 10px;"> 剩余库存: <span\n' +
+        '                            <span style="margin-left: 10px;" class="kucunView"> 剩余库存: <span\n' +
         '                                    class="badge badge-pill badge-success text-white card_count"></span></span>\n' +
         '                        </fieldset>\n' +
         '\n' +
@@ -153,7 +153,7 @@
             $('.product').show(150);
             res.data.forEach(item => {
                 map[item.id] = item;
-                $('#product').append('<span class="button-click" onclick="commodityClick(this,' + item.id + ')" ' + (item.card_count == 0 ? 'style="background-color: #ced4dadb;opacity: 0.6;"' : '') + '>' + item.name + '</span>');
+                $('#product').append('<span class="button-click" onclick="commodityClick(this,' + item.id + ')" ' + ((item.card_count == 0 && item.card_type == 0) ? 'style="background-color: #ced4dadb;opacity: 0.6;"' : '') + '>' + item.name + '</span>');
             });
         });
     };
@@ -187,7 +187,6 @@
         let buyNum = parseInt($('.buyNum').val());
         sort(money, buyNum);
     });
-
 
     let commodityClick = function (obj, id) {
         $('.fadeInLeft').hide();
@@ -255,10 +254,21 @@
         $('.description').html(info.desc.replace(/\n/g, "<br>"));
         $('.productName').html(info.name);
         $('.price').html("¥" + info.price);
+        //判断发货类型
+        if (info.card_type == 1) {
+            //手动发货
+            $('.cardType').html('手动发货');
+            $('.cardType').addClass('badge-danger');
+            $('.kucunView').hide();
+        } else {
+            $('.cardType').html('自动发货');
+            $('.cardType').addClass('badge-success');
+            $('.card_count').html(info.card_count);
+        }
+
         orderPrice = info.price;
         price = info.price;
         $('.contact').attr("placeholder", info.contact_tips);
-        $('.card_count').html(info.card_count);
         if (info.voucher_status == 1) {
             $('.voucher-view').show();
         }

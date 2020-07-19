@@ -12,6 +12,7 @@ use App\Model\Voucher;
 use App\Service\OrderServiceInterface;
 use App\Utils\AddressUtil;
 use App\Utils\DateUtil;
+use App\Utils\EmailUtil;
 use App\Utils\HttpUtil;
 use App\Utils\StringUtil;
 use Core\Exception\JSONException;
@@ -89,12 +90,14 @@ class OrderService implements OrderServiceInterface
             }
         }
 
-
-        //检测库存
-        $count = Card::query()->where("commodity_id", $commodityId)->where("status", 0)->count();
-        if ($count == 0 || $num > $count) {
-            throw new JSONException("当前商品库存不足，请稍后再试~");
+        if ($commodity->card_type == 0) {
+            //检测库存
+            $count = Card::query()->where("commodity_id", $commodityId)->where("status", 0)->count();
+            if ($count == 0 || $num > $count) {
+                throw new JSONException("当前商品库存不足，请稍后再试~");
+            }
         }
+
         //开始计算订单金额
         $amount = $this->getAmount($num, $commodity);
 
@@ -111,7 +114,7 @@ class OrderService implements OrderServiceInterface
 
 
         //创建订单
-        return DB::transaction(function () use ($amount, $payId, $commodityId, $ip, $device, $pass, $contact, $voucher, $num, $pay, $orderExt) {
+        return DB::transaction(function () use ($amount, $commodity, $payId, $commodityId, $ip, $device, $pass, $contact, $voucher, $num, $pay, $orderExt) {
             $date = DateUtil::current();
             $order = new Order();
             $order->trade_no = StringUtil::generateTradeNo();
@@ -124,6 +127,7 @@ class OrderService implements OrderServiceInterface
             $order->contact = $contact;
             $order->status = 0;
             $order->num = $num;
+            $order->send = 0;
 
             if (!empty($orderExt)) {
                 $order->exts = json_encode($orderExt, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
@@ -168,17 +172,33 @@ class OrderService implements OrderServiceInterface
 
                 $order->status = 1;
                 $order->pay_date = $date;
-                //取出对应的密钥
-                $card = Card::query()->where("commodity_id", $commodityId)->where("status", 0)->first();
-                if (!$card) {
-                    throw new JSONException("您的手慢了，商品被抢空");
-                }
-                $card->status = 1;
-                $card->contact = $contact;
-                $card->buy_date = $date;
-                $card->save();
 
-                $order->commodity = $card->card;
+                //判断自动发货
+                if ($commodity->card_type == 0) {
+                    //取出对应的密钥
+                    $card = Card::query()->where("commodity_id", $commodityId)->where("status", 0)->first();
+                    if (!$card) {
+                        throw new JSONException("您的手慢了，商品被抢空");
+                    }
+                    $card->status = 1;
+                    $card->contact = $contact;
+                    $card->buy_date = $date;
+                    $card->save();
+                    $order->commodity = $card->card;
+                    $order->send = 1;
+
+                    //发送邮件
+                    if ($commodity->email_notification == 1 && $commodity->card_type == 0 && $commodity->contact == 2) {
+                        $siteConfig = Bridge::getConfig('site');
+                        $emailConfig = Bridge::getConfig('email');
+                        EmailUtil::send($emailConfig, $siteConfig['title'], $order->commodity, $commodity->name, $order->contact);
+                    }
+                }else{
+                    $user = Bridge::getConfig('user');
+                    $order->commodity = '正在发货中，请耐心等待，如有疑问，请联系客服QQ：' . $user['qq'];
+                }
+
+
             } else {
                 //需要进行下单到第三方平台购买
                 $payConfig = Bridge::getConfig('pay');
@@ -257,41 +277,62 @@ class OrderService implements OrderServiceInterface
             return 'status error';
         }
 
-        return DB::transaction(function () use ($map, $user) {
+        $order = DB::transaction(function () use ($map, $user) {
             //获取订单
             $order = Order::query()->where("trade_no", $map['out_trade_no'])->where("status", 0)->first();
             if (!$order) {
                 throw new JSONException("order not found");
             }
-            //取出和订单相同数量的卡密
-            $cards = Card::query()->where("status", 0)->limit($order->num)->get();
+
+            $shop = $order->shop;
             $order->pay_date = DateUtil::current();
             $order->status = 1;
-            if (count($cards) != $order->num) {
-                $order->commodity = '很抱歉，当前库存不足，自动发卡失败，请联系客服QQ：' . $user['qq'];
-            } else {
-                //将全部卡密置已销售状态
-                $ids = [];
-                $cardc = '';
-                foreach ($cards as $card) {
-                    $ids[] = $card->id;
-                    $cardc .= $card->card . PHP_EOL;
-                }
-                try {
-                    $rows = Card::query()->whereIn("id", $ids)->update(['buy_date' => $order->pay_date, 'contact' => $order->contact, 'status' => 1]);
-                    if ($rows == 0) {
-                        $order->commodity = '很抱歉，当前库存不足，自动发卡失败，请联系客服QQ：' . $user['qq'];
-                    } else {
-                        //将卡密写入到订单中
-                        $order->commodity = trim($cardc, PHP_EOL);
-                    }
-                } catch (\Exception $e) {
+
+            if ($shop->card_type == 0) {
+                //取出和订单相同数量的卡密
+                $cards = Card::query()->where("status", 0)->limit($order->num)->get();
+                if (count($cards) != $order->num) {
                     $order->commodity = '很抱歉，当前库存不足，自动发卡失败，请联系客服QQ：' . $user['qq'];
+                } else {
+                    //将全部卡密置已销售状态
+                    $ids = [];
+                    $cardc = '';
+                    foreach ($cards as $card) {
+                        $ids[] = $card->id;
+                        $cardc .= $card->card . PHP_EOL;
+                    }
+                    try {
+                        $rows = Card::query()->whereIn("id", $ids)->update(['buy_date' => $order->pay_date, 'contact' => $order->contact, 'status' => 1]);
+                        if ($rows == 0) {
+                            $order->commodity = '很抱歉，当前库存不足，自动发卡失败，请联系客服QQ：' . $user['qq'];
+                        } else {
+                            //将卡密写入到订单中
+                            $order->commodity = trim($cardc, PHP_EOL);
+                        }
+                    } catch (\Exception $e) {
+                        $order->commodity = '很抱歉，当前库存不足，自动发卡失败，请联系客服QQ：' . $user['qq'];
+                    }
                 }
+                $order->send = 1;
+            } else {
+                //手动发货
+                $order->commodity = '正在发货中，请耐心等待，如有疑问，请联系客服QQ：' . $user['qq'];
             }
 
             $order->save();
-            return 'success';
+            return $order;
         });
+
+        //获取商品
+        $shop = $order->shop;
+        //检测是否需要发邮件
+        if ($shop->email_notification == 1 && $shop->card_type == 0 && $shop->contact == 2) {
+            $siteConfig = Bridge::getConfig('site');
+            $emailConfig = Bridge::getConfig('email');
+            EmailUtil::send($emailConfig, $siteConfig['title'], $order->commodity, $shop->name, $order->contact);
+        }
+
+        //发送邮件
+        return 'success';
     }
 }

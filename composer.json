@@ -21,7 +21,8 @@
     "symfony/var-dumper": "^5.1",
     "illuminate/pagination": "^7.19",
     "rah/danpu": "^2.7",
-    "ext-json": "*"
+    "ext-json": "*",
+    "phpmailer/phpmailer": "^6.1"
   },
   "autoload": {
     "psr-4": {

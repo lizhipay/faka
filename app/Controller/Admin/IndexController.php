@@ -120,6 +120,15 @@ class IndexController extends AdminBaseController
      * @return string
      * @throws RuntimeException
      */
+    public function email()
+    {
+        return $this->render('邮件配置', 'email.html', ['email' => Bridge::getConfig('email')]);
+    }
+
+    /**
+     * @return string
+     * @throws RuntimeException
+     */
     public function payConfig()
     {
         return $this->render('支付配置', 'payConfig.html', ['pay' => Bridge::getConfig('pay')]);

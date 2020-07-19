@@ -53,9 +53,9 @@ class OrderController extends IndexBaseController
         $keywords = trim((string)$keywords);
         $filed = ['id', 'trade_no', 'amount', 'pay_id', 'commodity_id', 'create_date', 'pay_date', 'status', 'num', 'contact', 'voucher_id'];
 
-        $order = Order::query()->where("trade_no", $keywords)->with(['pay', 'voucher', 'commodity'])->get($filed);
+        $order = Order::query()->where("trade_no", $keywords)->with(['pay', 'voucher', 'shop'])->get($filed);
         if (count($order) == 0) {
-            $order = Order::query()->where("contact", $keywords)->with(['pay', 'voucher', 'commodity'])->orderBy("id", "desc")->limit(10)->get($filed);
+            $order = Order::query()->where("contact", $keywords)->with(['pay', 'voucher', 'shop'])->orderBy("id", "desc")->limit(10)->get($filed);
         }
 
         if (count($order) == 0) {

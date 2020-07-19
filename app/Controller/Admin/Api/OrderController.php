@@ -10,7 +10,9 @@ use App\Entity\QueryTemplateEntity;
 use App\Interceptor\AdminApiInterceptor;
 use App\Model\Order;
 use App\Quickly\QueryServiceQuickly;
+use App\Utils\EmailUtil;
 use Core\Exception\JSONException;
+use Core\Utils\Bridge;
 
 /**
  * Class OrderController
@@ -34,7 +36,7 @@ class OrderController extends AdminApiBaseController
         $queryTemplateEntity->setPage((int)$_POST['page']);
         $queryTemplateEntity->setPaginate(true);
         $queryTemplateEntity->setWhere($map);
-        $queryTemplateEntity->setWith(['pay']);
+        $queryTemplateEntity->setWith(['pay', 'shop']);
         $data = $this->findTemplateAll($queryTemplateEntity)->toArray();
         $json = $this->json(200, null, $data['data']);
         $json['count'] = $data['total'];
@@ -56,6 +58,18 @@ class OrderController extends AdminApiBaseController
         if (!$save) {
             throw new JSONException("本次操作没有任何更改");
         }
+
+        //发送邮件
+        if ($map['send'] == 1) {
+            $order = Order::query()->find($map['id']);
+            $shop = $order->shop;
+            if ($shop->email_notification == 1 && $shop->contact == 2) {
+                $siteConfig = Bridge::getConfig('site');
+                $emailConfig = Bridge::getConfig('email');
+                EmailUtil::send($emailConfig, $siteConfig['title'], $order->commodity, $shop->name, $order->contact);
+            }
+        }
+
         return $this->json(200, '操作成功');
     }
 

@@ -1,0 +1,64 @@
+#{include file="./header.html"}
+<div id="main-content">
+    <div class="container-fluid" style="margin-top: 20px">
+
+        <div class="row clearfix">
+
+            <div class="col-xl-12 col-lg-12 col-md-12">
+                <div class="card">
+                    <div class="header">
+                        <h2>邮件配置（STMP协议）</h2>
+                    </div>
+                    <div class="body">
+                        <form id="data-form" method="post">
+
+                            <div class="form-group">
+                                <label>SMTP服务器</label>
+                                <input type="text" name="smtp" class="form-control" value="#{$email.smtp}"
+                                       placeholder="请输入STMP服务器">
+                            </div>
+
+                            <div class="form-group">
+                                <label>端口</label>
+                                <input type="text" name="port" class="form-control" value="#{$email.port}"
+                                       placeholder="请输入STMP端口">
+                            </div>
+
+                            <div class="form-group">
+                                <label>账号</label>
+                                <input type="text" name="user" class="form-control" value="#{$email.user}"
+                                       placeholder="请输入账号">
+                            </div>
+
+                            <div class="form-group">
+                                <label>密码</label>
+                                <input type="text" name="pass" class="form-control" value="#{$email.pass}"
+                                       placeholder="请输入密码">
+                            </div>
+
+                            <button type="button" class="btn btn-primary edit">立即修改</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    $(function () {
+        layui.use(['layer', 'form', 'hex'], function () {
+
+            let hex = layui.hex;
+
+            $('.edit').click(function () {
+                $.post('/admin/api/config/editEmail', $('#data-form').serialize(), res => {
+                    layer.msg(res.msg);
+                });
+            });
+        });
+    });
+</script>
+
+#{include file="./footer.html"}
