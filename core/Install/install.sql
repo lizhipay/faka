@@ -149,5 +149,8 @@ CREATE TABLE `__PREFIX__voucher`  (
 
 ALTER TABLE `__PREFIX__commodity` add input_ext text COMMENT '扩展前台购买输入信息';
 ALTER TABLE `__PREFIX__order` add exts text COMMENT '扩展信息存放字段';
+ALTER TABLE `__PREFIX__commodity` add card_type tinyint(4) UNSIGNED NOT NULL DEFAULT 0 COMMENT '发卡方式切换';
+ALTER TABLE `__PREFIX__commodity` add email_notification tinyint(4) UNSIGNED NOT NULL DEFAULT 0 COMMENT '增加邮件通知';
+ALTER TABLE `__PREFIX__order` add send tinyint(4) UNSIGNED NOT NULL DEFAULT 1 COMMENT '发货状态';
 
 SET FOREIGN_KEY_CHECKS = 1;
