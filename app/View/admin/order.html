@@ -1,4 +1,12 @@
 #{include file="./header.html"}
+<style>
+    .hr-top {
+        margin-bottom: 10px;
+        border-bottom: 1px dashed rgba(229, 229, 229, 0.15);
+        position: relative;
+        padding-bottom: 5px;
+    }
+</style>
 <div id="main-content">
     <div class="container-fluid" style="margin-top: 20px">
         <div class="row clearfix">
@@ -89,6 +97,14 @@
                             return '<span class="badge badge-success edit" data-id="' + item.id + '">查看</span>';
                         }
                     }
+                    , {
+                        title: '扩展信息', templet: function (item) {
+                            if (item.exts == null) {
+                                return '-';
+                            }
+                            return '<span class="badge badge-success exts" data-id="' + item.id + '">查看</span>';
+                        }
+                    }
                     ,
                     {
                         field: 'create_device', title: '设备', templet: function (item) {
@@ -116,6 +132,28 @@
                     $('.edit').click(function () {
                         let mapItem = cao.getMapItem(this);
                         modal(mapItem);
+                    });
+
+                    $('.exts').click(function () {
+                        let mapItem = cao.getMapItem(this);
+
+                        let exts = JSON.parse(mapItem.exts), info = [];
+
+                        exts.forEach(item => {
+                            if (item.type == 'textarea') {
+                                info.push('<div class="hr-top"><b style="color: #ffffff;position: relative;top: -84px;">' + item.title + '：</b>' + '<textarea class="form-control" style="color:white;height: 100px;width:75%;display: inline-block;border: none;">' + item.value + '</textarea>'+ "</div>");
+                            } else {
+                                info.push('<div  class="hr-top"><b style="color: #ffffff;">' + item.title + '：</b>' + item.value + "</div>");
+                            }
+                        });
+
+                        layer.open({
+                            type: 1,
+                            shade: [0.1, '#393D49'],
+                            title: false,
+                            shadeClose: true,
+                            content: '<div style="float:left;width:330px;  word-wrap: break-word;word-break: break-all;overflow: hidden;  background:rgb(236,160,188); padding:10px;color: white;border-radius: 10px;">' + info.join('') + '</div>',
+                        });
                     });
                 }
             });

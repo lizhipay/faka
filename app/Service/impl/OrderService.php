@@ -29,7 +29,7 @@ class OrderService implements OrderServiceInterface
      * @inheritDoc
      * @throws JSONException
      */
-    public function trade(string $contact, int $num, string $pass, int $payId, int $device, string $voucher, int $commodityId, string $ip): array
+    public function trade(string $contact, int $num, string $pass, int $payId, int $device, string $voucher, int $commodityId, string $ip, array $post): array
     {
         if ($commodityId == 0) {
             throw new JSONException('请选择商品再进行下单');
@@ -62,6 +62,34 @@ class OrderService implements OrderServiceInterface
             }
         }
 
+        //开始构建自定义信息
+        $inputExt = json_decode((string)$commodity->input_ext, true);
+        $orderExt = [];
+        if (count($inputExt) > 0) {
+            foreach ($inputExt as $item) {
+                $value = $post[$item['name']];
+                if ($item['type'] == 'checkbox') {
+                    $value = (array)$value;
+                    if ($item['required'] == 1 && count($value) == 0) {
+                        throw new JSONException($item['title'] . '不能为空');
+                    }
+                } else {
+                    //验证是否检测空
+                    if ($item['required'] == 1 && $value === "") {
+                        throw new JSONException($item['title'] . '不能为空');
+                    }
+                    //正则验证
+                    if ($item['regx'] != "" && $item['regx'] != null) {
+                        if (!preg_match("/{$item['regx']}/", $value)) {
+                            throw new JSONException($item['error']);
+                        }
+                    }
+                }
+                $orderExt[] = ['name' => $item['name'], 'type' => $item['type'], 'title' => $item['title'], 'value' => $value];
+            }
+        }
+
+
         //检测库存
         $count = Card::query()->where("commodity_id", $commodityId)->where("status", 0)->count();
         if ($count == 0 || $num > $count) {
@@ -83,7 +111,7 @@ class OrderService implements OrderServiceInterface
 
 
         //创建订单
-        return DB::transaction(function () use ($amount, $payId, $commodityId, $ip, $device, $pass, $contact, $voucher, $num, $pay) {
+        return DB::transaction(function () use ($amount, $payId, $commodityId, $ip, $device, $pass, $contact, $voucher, $num, $pay, $orderExt) {
             $date = DateUtil::current();
             $order = new Order();
             $order->trade_no = StringUtil::generateTradeNo();
@@ -96,6 +124,10 @@ class OrderService implements OrderServiceInterface
             $order->contact = $contact;
             $order->status = 0;
             $order->num = $num;
+
+            if (!empty($orderExt)) {
+                $order->exts = json_encode($orderExt, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+            }
 
             if ($pass != '') {
                 $order->pass = $pass;

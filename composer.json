@@ -20,7 +20,8 @@
     "illuminate/database": "^7.19",
     "symfony/var-dumper": "^5.1",
     "illuminate/pagination": "^7.19",
-    "rah/danpu": "^2.7"
+    "rah/danpu": "^2.7",
+    "ext-json": "*"
   },
   "autoload": {
     "psr-4": {

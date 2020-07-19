@@ -16,7 +16,7 @@ use Core\Exception\JSONException;
 /**
  * Class CardController
  * @package app\Controller\Admin\Api
- * @Interceptor(AdminApiInterceptor::clsss)
+ * @Interceptor(AdminApiInterceptor::class)
  */
 class CardController extends AdminApiBaseController
 {

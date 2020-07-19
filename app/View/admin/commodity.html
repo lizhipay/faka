@@ -1,4 +1,10 @@
 #{include file="./header.html"}
+<style>
+    .layui-layer-page .layui-layer-content {
+        position: relative !important;
+        overflow: auto !important;
+    }
+</style>
 <div id="main-content">
 
     <div class="container-fluid" style="margin-top: 20px">
@@ -171,12 +177,22 @@
                         ], placeholder: "请选择用户填写的联系方式类"
                     },
                     {title: "提示信息", name: "contact_tips", type: "input", placeholder: "输入联系方式时的提示文字"},
+                    {
+                        title: "<a class='input-ext-tips' href='https://lizhime.com/97.html' target='_blank' style='color: red;z-index: 9999;'>扩展信息</a>",
+                        name: "input_ext",
+                        type: "textarea",
+                        height: 100,
+                        placeholder: "该功能用作于扩展前台用户输入信息，鼠标点击左边红色字“扩展信息”然后仅需学习如何填写扩展信息规则！"
+                    },
                     {title: "优惠卷", name: "voucher_status", type: "switch", text: "启用"},
                     {title: "商品排序", name: "sort", type: "input", placeholder: "值越小，排名越靠前哦~"},
                     {title: "状态", name: "status", type: "switch", text: "启用"},
                 ], res => {
                     tableInstance.reload();
-                }, values);
+                }, values, ['660px', '720px'], false, "添加", function () {
+                    let tipsView = $('.input-ext-tips');
+                    tipsView.parent().css('height', "100px");
+                });
             }
 
             $('.btn-app-create').click(function () {

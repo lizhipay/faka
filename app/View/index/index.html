@@ -78,6 +78,7 @@
 </div>
 </div>
 
+
 <script>
     let map = [];
     let ws = [];
@@ -88,7 +89,7 @@
     let shopInfoHtml = '<div class="card-header">\n' +
         '                <p class="card-title">商品信息:</p>\n' +
         '            </div>\n' +
-        '            <div class="card-block">\n' +
+        '           <form id="buyForm"> <div class="card-block">\n' +
         '                <div class="row">\n' +
         '                    <div class="col-md-5 description"></div>\n' +
         '                    <div class="col-md-7">\n' +
@@ -99,24 +100,24 @@
         '                        <p>发货方式： <span class="badge badge-pill badge-success text-white">自动发货</span></p>\n' +
         '                        <fieldset class="form-group">\n' +
         '                            <label style="display: inline-block;">联系方式：</label>\n' +
-        '                            <input class="form-control round contact" placeholder="">\n' +
-        '                        </fieldset>\n' +
+        '                            <input class="form-control round contact" name="contact" placeholder="">\n' +
+        '                        </fieldset><div class="hookExt"></div>\n' +
         '\n' +
         '                        #{if $site.pass == 1}\n' +
         '                        <fieldset class="form-group">\n' +
         '                            <label style="display: inline-block;">查询密码：</label>\n' +
-        '                            <input class="form-control round pass" placeholder="查询订单时的密码..">\n' +
+        '                            <input class="form-control round pass" name="pass" placeholder="查询订单时的密码..">\n' +
         '                        </fieldset>\n' +
         '                        #{/if}\n' +
         '\n' +
         '                        <fieldset class="form-group voucher-view" style="display: none;">\n' +
         '                            <label style="display: inline-block;">&nbsp;&nbsp;&nbsp;&nbsp;优惠卷：</label>\n' +
-        '                            <input class="form-control round voucher" placeholder="如果您有优惠卷可以填写优惠卷，没有可不填写">\n' +
+        '                            <input class="form-control round voucher" name="voucher" placeholder="如果您有优惠卷可以填写优惠卷，没有可不填写">\n' +
         '                        </fieldset>\n' +
         '\n' +
         '                        <fieldset class="form-group">\n' +
         '                            <label>购买数量：</label>\n' +
-        '                            <input class="form-control round buyNum" type="number" style="width: 10%;" value="1">\n' +
+        '                            <input class="form-control round buyNum" name="num" type="number" style="width: 10%;" value="1">\n' +
         '                            <span style="margin-left: 10px;"> 剩余库存: <span\n' +
         '                                    class="badge badge-pill badge-success text-white card_count"></span></span>\n' +
         '                        </fieldset>\n' +
@@ -128,7 +129,7 @@
         '                        </fieldset>\n' +
         '                    </div>\n' +
         '                </div>\n' +
-        '            </div>';
+        '            </div></form>';
 
     let switchElement = function (obj) {
         $('.checked').removeClass('checked');
@@ -194,6 +195,63 @@
         commodityId = id;
         switchElement(obj);
         let info = map[id];
+        //解析json
+        let parse = JSON.parse(info.input_ext);
+        //开始渲染自定义信息
+        if (parse != null) {
+            let hookExt = $('.hookExt');
+            parse.forEach(ext => {
+                let isDefault = ext.default != "" && ext.hasOwnProperty('default') && ext.default != null;
+                let html;
+                switch (ext.type) {
+                    //文本框
+                    case 'text':
+                        hookExt.append('<fieldset class="form-group">\n' +
+                            '                            <label style="display: inline-block;">' + ext.title + '：</label>\n' +
+                            '                            <input type="text" value="' + (isDefault ? ext.default : "") + '" name="' + ext.name + '" class="form-control round" placeholder="' + ext.tips + '">' +
+                            '                        </fieldset>');
+                        break;
+                    case 'password':
+                        hookExt.append('<fieldset class="form-group">\n' +
+                            '                            <label style="display: inline-block;">' + ext.title + '：</label>\n' +
+                            '                            <input type="password" value="' + (isDefault ? ext.default : "") + '" name="' + ext.name + '" class="form-control round" placeholder="' + ext.tips + '">' +
+                            '                        </fieldset>');
+                        break;
+                    case 'textarea':
+                        hookExt.append('<fieldset class="form-group">\n' +
+                            '                            <label style="display: inline-block;position: relative;top: -' + (ext.height - 20) + 'px;">' + ext.title + '：</label>\n' +
+                            '                          <textarea style="height: ' + ext.height + 'px;" class="form-control round" name="' + ext.name + '" placeholder="' + ext.tips + '">' + (isDefault ? ext.default : "") + '</textarea> ' +
+                            '                        </fieldset>');
+                        break;
+                    //下拉框
+                    case 'select':
+                        html = '<fieldset class="form-group"><label style="display: inline-block;">' + ext.title + '：</label><select style="margin-left: 4px;" class="form-control round" name="' + ext.name + '"><option value="">' + ext.tips + '</option>';
+                        for (let key in ext.contents) {
+                            html += '<option value="' + key + '" ' + (isDefault && key == ext.default ? 'selected' : '') + '>' + ext.contents[key] + '</option>';
+                        }
+                        html += '</select></fieldset>';
+                        hookExt.append(html);
+                        break;
+                    //单选框
+                    case 'radio':
+                        html = '<fieldset class="form-group"><label style="display: inline-block;">' + ext.title + '：</label><span style="margin-left: 4px;" ></span>';
+                        for (let key in ext.contents) {
+                            html += '<label style="margin-right: 5px;position: relative;top: 1px;"><input ' + (isDefault && key == ext.default ? 'checked' : '') + ' type="radio" name="' + ext.name + '" value="' + key + '"> ' + ext.contents[key] + '</label> ';
+                        }
+                        html += '</fieldset>';
+                        hookExt.append(html);
+                        break;
+                    case 'checkbox':
+                        html = '<fieldset class="form-group"><label style="display: inline-block;">' + ext.title + '：</label><span style="margin-left: 4px;" ></span>';
+                        for (let key in ext.contents) {
+                            html += '<label style="margin-right: 5px;position: relative;top: 1px;"><input ' + (isDefault && ext.default.indexOf(key) != -1 ? 'checked' : '') + ' type="checkbox" name="' + ext.name + '[]" value="' + key + '"> ' + ext.contents[key] + '</label> ';
+                        }
+                        html += '</fieldset>';
+                        hookExt.append(html);
+                        break;
+                }
+            });
+        }
         $('.description').html(info.desc.replace(/\n/g, "<br>"));
         $('.productName').html(info.name);
         $('.price').html("¥" + info.price);
@@ -234,15 +292,16 @@
             let layIndex = layer.load(1, {
                 shade: [0.3, '#fff'] //0.1透明度的白色背景
             });
-            $.post('/index/api/order/trade', {
-                contact: $('.contact').val(),
-                num: buyNum,
-                pass: $('.pass').val(),
-                payId: payId,
-                device: pay.device(),
-                voucher: $('.voucher').val(),
-                commodityId: commodityId
-            }, res => {
+            /* {
+                 contact: $('.contact').val(),
+                 num: buyNum,
+                 pass: $('.pass').val(),
+                 payId: payId,
+                 device: pay.device(),
+                 voucher: $('.voucher').val(),
+                 commodityId: commodityId
+             }*/
+            $.post('/index/api/order/trade', "payId=" + payId + "&device=" + pay.device() + "&commodityId=" + commodityId + "&" + $('#buyForm').serialize(), res => {
                 layer.close(layIndex);
                 if (res.code == 200) {
                     if (res.data.amount == 0) {

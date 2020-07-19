@@ -11,7 +11,7 @@ use App\Service\VersionServiceInterface;
 /**
  * Class VersionController
  * @package app\Controller\Admin\Api
- * @Interceptor(AdminApiInterceptor::clsss)
+ * @Interceptor(AdminApiInterceptor::class)
  */
 class VersionController extends AdminApiBaseController
 {

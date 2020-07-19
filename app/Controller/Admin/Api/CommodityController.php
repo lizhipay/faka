@@ -16,7 +16,7 @@ use Illuminate\Database\Eloquent\Builder;
 /**
  * Class CommodityController
  * @package app\Controller\Admin\Api
- * @Interceptor(AdminApiInterceptor::clsss)
+ * @Interceptor(AdminApiInterceptor::class)
  */
 class CommodityController extends AdminApiBaseController
 {

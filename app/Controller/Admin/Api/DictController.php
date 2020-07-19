@@ -11,7 +11,7 @@ use App\Interceptor\AdminApiInterceptor;
 /**
  * Class DictController
  * @package App\Controller\User\Api
- * @Interceptor(AdminApiInterceptor::clsss)
+ * @Interceptor(AdminApiInterceptor::class)
  */
 class DictController extends AdminApiBaseController
 {

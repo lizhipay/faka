@@ -36,7 +36,7 @@ class OrderController extends IndexBaseController
      */
     public function trade($contact, $num, $pass, $payId, $device, $voucher, $commodityId): array
     {
-        $order = $this->orderService->trade((string)$contact, (int)$num, (string)$pass, (int)$payId, (int)$device, (string)$voucher, (int)$commodityId, AddressUtil::getClient());
+        $order = $this->orderService->trade((string)$contact, (int)$num, (string)$pass, (int)$payId, (int)$device, (string)$voucher, (int)$commodityId, AddressUtil::getClient(), $_POST);
         return $this->json(200, '下单成功', $order);
     }
 

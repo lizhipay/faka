@@ -147,4 +147,7 @@ CREATE TABLE `__PREFIX__voucher`  (
   CONSTRAINT `__PREFIX__voucher_ibfk_1` FOREIGN KEY (`commodity_id`) REFERENCES `__PREFIX__commodity` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT
 ) ENGINE = InnoDB CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
 
+ALTER TABLE `__PREFIX__commodity` add input_ext json COMMENT '扩展前台购买输入信息';
+ALTER TABLE `__PREFIX__order` add exts json COMMENT '扩展信息存放字段';
+
 SET FOREIGN_KEY_CHECKS = 1;

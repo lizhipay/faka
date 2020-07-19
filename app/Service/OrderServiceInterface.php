@@ -19,9 +19,10 @@ interface OrderServiceInterface
      * @param string $voucher
      * @param int $commodityId
      * @param string $ip
+     * @param array $post
      * @return mixed
      */
-    public function trade(string $contact, int $num, string $pass, int $payId, int $device, string $voucher, int $commodityId, string $ip): array;
+    public function trade(string $contact, int $num, string $pass, int $payId, int $device, string $voucher, int $commodityId, string $ip, array $post): array;
 
 
     /**

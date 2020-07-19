@@ -16,7 +16,7 @@ use Core\Exception\JSONException;
 /**
  * Class CategoryController
  * @package app\Controller\Admin\Api
- * @Interceptor(AdminApiInterceptor::clsss)
+ * @Interceptor(AdminApiInterceptor::class)
  */
 class CategoryController extends AdminApiBaseController
 {

@@ -24,26 +24,6 @@ class ShopController extends IndexBaseController
             $relation->where("status", 0);
         }])->where("category_id", $categoryId)->where("status", 1)->orderBy("sort", "asc")->get()->toArray();
 
-
-/*
-        if ($data['wholesale_status'] == 1) {
-            $list = [];
-            $x = '';
-            $wholesales = explode(PHP_EOL, trim(trim((string)$data['wholesale']), PHP_EOL));
-            foreach ($wholesales as $item) {
-                $s = explode('-', $item);
-                if (count($s) == 2) {
-                    $list[$s[0]] = $s[1];
-                }
-            }
-            ksort($list);
-            foreach ($list as $k => $v) {
-                $x .= '<div>购买' . $k . '张，单价自动调整为：<b>' . number_format($v, 2, '.', '') . '</b>元</div>';
-            }
-
-            $data['wholesale'] = $x;
-        }*/
-
         return $this->json(200, 'success', $data);
     }
 }
