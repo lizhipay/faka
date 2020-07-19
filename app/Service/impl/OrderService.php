@@ -63,7 +63,7 @@ class OrderService implements OrderServiceInterface
         }
 
         //开始构建自定义信息
-        $inputExt = json_decode((string)$commodity->input_ext, true);
+        $inputExt = (array)json_decode((string)$commodity->input_ext, true);
         $orderExt = [];
         if (count($inputExt) > 0) {
             foreach ($inputExt as $item) {
