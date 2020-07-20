@@ -131,6 +131,10 @@
                         <div class="tab-content">
                             <div class="tab-pane vivify fadeIn show active" id="Version">
 
+                                <div class="hr-top"><span style="color: red;font-size: 16px;">v1.3.2 - 2020/07/20</span>
+                                    <p>增加自定义支付网关地址，所有更新该版本的请在"支付配置"中填写网关地址，否则支付无法使用。</p>
+                                </div>
+
                                 <div class="hr-top"><span style="color: red;font-size: 16px;">v1.3.1 - 2020/07/20</span>
                                     <p>增加前台统计功能，在“网站设置”启用</p>
                                 </div>
@@ -209,9 +213,9 @@
                     layer.msg("您已经是最新版了，无需更新！");
                     return;
                 }
-
                 layer.confirm(versionInfo.content, {
                     btn: ['立即更新', '取消更新'] //按钮
+                    , title: "v" + versionInfo.version + " - 更新程式"
                 }, function () {
                     //更新新版本
                     let layIndex = layer.load(1, {

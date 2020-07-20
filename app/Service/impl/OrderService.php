@@ -215,12 +215,12 @@ class OrderService implements OrderServiceInterface
 
                 $postData['sign'] = StringUtil::generateSignature($postData, $payConfig['key']);
 
-                $request = HttpUtil::request('https://lizhifu.net/order/trade', $postData);
+                $request = HttpUtil::request(trim($payConfig['url'], "/") . '/order/trade', $postData);
 
                 $json = json_decode((string)$request, true);
 
                 if ($json['code'] != 200) {
-                    throw new JSONException("当前支付方式不可用，请换个支付方式再试！");
+                    throw new JSONException($json['msg']);
                 }
 
                 $url = $json['data']['url'];
