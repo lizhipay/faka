@@ -193,7 +193,7 @@ class OrderService implements OrderServiceInterface
                         $emailConfig = Bridge::getConfig('email');
                         EmailUtil::send($emailConfig, $siteConfig['title'], $order->commodity, $commodity->name, $order->contact);
                     }
-                }else{
+                } else {
                     $user = Bridge::getConfig('user');
                     $order->commodity = '正在发货中，请耐心等待，如有疑问，请联系客服QQ：' . $user['qq'];
                 }
@@ -290,7 +290,7 @@ class OrderService implements OrderServiceInterface
 
             if ($shop->card_type == 0) {
                 //取出和订单相同数量的卡密
-                $cards = Card::query()->where("status", 0)->limit($order->num)->get();
+                $cards = Card::query()->where("commodity_id", $order->commodity_id)->where("status", 0)->limit($order->num)->get();
                 if (count($cards) != $order->num) {
                     $order->commodity = '很抱歉，当前库存不足，自动发卡失败，请联系客服QQ：' . $user['qq'];
                 } else {
