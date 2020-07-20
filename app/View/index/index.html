@@ -122,6 +122,8 @@
         '                                    class="badge badge-pill badge-success text-white card_count"></span></span>\n' +
         '                        </fieldset>\n' +
         '\n' +
+        '                        <p style="display: none;" class="payAmountView">支付金额： <span class="text-danger payAmount"></span></p>\n' +
+        '\n' +
         '                        <fieldset class="form-group wholesale" style="display: none;">\n' +
         '                            <label style="color: #007bff;font-size: 14px;">批发优惠已开放</label>\n' +
         '                            <div style="font-size: 12px;color: red;" class="wholesaleHtml">\n' +
@@ -158,39 +160,44 @@
         });
     };
 
-    function sort(money, buyNum) {
-        let b = [];
-        ws.forEach((item, key) => {
-            b.push(key)
+    let getPrice = function () {
+        let num = $('.buyNum').val();
+        if (parseInt(num) <= 0 || num === "") {
+            num = 1;
+            $('.buyNum').val(1);
+        }
+        let layIndex = layer.load(1, {
+            shade: [0.3, '#fff'] //0.1透明度的白色背景
         });
-        let g = b.sort(function (a, b) {
-            return b - a;
-        });
-
-        for (var i = 0; i < g.length; i++) {
-            if (buyNum >= g[i]) {
-                money = ws[g[i]];
-                break;
+        $.post('/index/api/order/getTradeAmount', {
+            num: num,
+            voucher: $('.voucher').val(),
+            commodityId: commodityId
+        }, res => {
+            layer.close(layIndex);
+            if (res.code == 200) {
+                $('.payAmountView').show(50);
+                $('.payAmount').html("<b style='font-size:16px;color: red;'>" + res.data.amount.toFixed(2) + " 元</b>" + (res.data.voucher != 0 ? ' <span style="color: #0000FF;font-size: 14px;"><优惠卷已优惠' + res.data.voucher + '元> </span>' : ''));
+                $('.price').html("¥" + res.data.price);
+                orderPrice = res.data.amount.toFixed(2);
+            } else {
+                layer.msg(res.msg);
             }
-        }
-
-        if (money != price) {
-            $('.price').html("¥" + money + " (<small style='color: red;'>已自动减价</small>)");
-        } else {
-            $('.price').html("¥" + money);
-        }
-        orderPrice = money;
+        });
     }
-
-    $('.buyNum').change(function () {
-        let money = price;
-        let buyNum = parseInt($('.buyNum').val());
-        sort(money, buyNum);
-    });
 
     let commodityClick = function (obj, id) {
         $('.fadeInLeft').hide();
         $('.shopInfoHtml').html(shopInfoHtml);
+
+        $('.buyNum').change(function () {
+            getPrice();
+        });
+
+        $('.voucher').change(function () {
+            getPrice();
+        });
+
         commodityId = id;
         switchElement(obj);
         let info = map[id];
@@ -251,7 +258,7 @@
                 }
             });
         }
-        $('.description').html(info.desc.replace(/\n/g, "<br>"));
+        $('.description').html(info.desc == null ? '' : info.desc.replace(/\n/g, "<br>"));
         $('.productName').html(info.name);
         $('.price').html("¥" + info.price);
         //判断发货类型
@@ -291,26 +298,18 @@
             }
         }
         $('.fadeInLeft').show(150);
+        getPrice();
     };
 
     let Buy = function (payId) {
         var mapElement = map[commodityId];
         let buyNum = $('.buyNum').val();
-        layer.confirm('您购买的商品是<b style="color: #0ace36;">' + mapElement.name + '</b>，单价为：<b style="color: red;">' + orderPrice + '</b>元，购买数量：<b style="color: blue;">' + buyNum + '</b>，请确认是否要继续购买？', {
+        layer.confirm('您购买的商品是 <b style="color: #0ace36;font-size: 18px;">' + mapElement.name + '</b>，购买数量：<b style="color: blue;font-size: 18px;font-weight: bold;">' + buyNum + '</b>个，需支付金额：<b style="color: red;font-weight: bold;font-size: 18px;">' + orderPrice + ' 元</b>，请确认是否要继续购买？', {
             btn: ['<span style="color: white;">确认</span>', '取消'] //按钮
         }, function () {
             let layIndex = layer.load(1, {
                 shade: [0.3, '#fff'] //0.1透明度的白色背景
             });
-            /* {
-                 contact: $('.contact').val(),
-                 num: buyNum,
-                 pass: $('.pass').val(),
-                 payId: payId,
-                 device: pay.device(),
-                 voucher: $('.voucher').val(),
-                 commodityId: commodityId
-             }*/
             $.post('/index/api/order/trade', "payId=" + payId + "&device=" + pay.device() + "&commodityId=" + commodityId + "&" + $('#buyForm').serialize(), res => {
                 layer.close(layIndex);
                 if (res.code == 200) {

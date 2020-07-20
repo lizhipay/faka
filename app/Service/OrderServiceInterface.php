@@ -26,6 +26,16 @@ interface OrderServiceInterface
 
 
     /**
+     * 获取购买时的价格
+     * @param int $num
+     * @param string $voucher
+     * @param int $commodityId
+     * @return array
+     */
+    public function getTradeAmount(int $num, string $voucher, int $commodityId): array;
+
+
+    /**
      * @param array $map
      * @return mixed
      */

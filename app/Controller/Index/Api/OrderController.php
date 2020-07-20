@@ -42,6 +42,20 @@ class OrderController extends IndexBaseController
 
 
     /**
+     * 获取下单的金额
+     * @param $num
+     * @param $voucher
+     * @param $commodityId
+     * @return array
+     */
+    public function getTradeAmount($num, $voucher, $commodityId): array
+    {
+        $price = $this->orderService->getTradeAmount((int)$num, (string)$voucher, (int)$commodityId);
+        return $this->json(200, 'success', $price);
+    }
+
+
+    /**
      * 订单查询
      * @param $keywords
      * @param $pass

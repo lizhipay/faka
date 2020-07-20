@@ -195,10 +195,9 @@ class OrderService implements OrderServiceInterface
                     }
                 } else {
                     $user = Bridge::getConfig('user');
-                    $order->commodity = '正在发货中，请耐心等待，如有疑问，请联系客服QQ：' . $user['qq'];
+                    $message = ($commodity->delivery_message != null && $commodity->delivery_message != "") ? $commodity->delivery_message : '正在发货中，请耐心等待，如有疑问，请联系客服QQ：' . $user['qq'];
+                    $order->commodity = $message;
                 }
-
-
             } else {
                 //需要进行下单到第三方平台购买
                 $payConfig = Bridge::getConfig('pay');
@@ -316,7 +315,8 @@ class OrderService implements OrderServiceInterface
                 $order->send = 1;
             } else {
                 //手动发货
-                $order->commodity = '正在发货中，请耐心等待，如有疑问，请联系客服QQ：' . $user['qq'];
+                $message = ($shop->delivery_message != null && $shop->delivery_message != "") ? $shop->delivery_message : '正在发货中，请耐心等待，如有疑问，请联系客服QQ：' . $user['qq'];
+                $order->commodity = $message;
             }
 
             $order->save();
@@ -334,5 +334,56 @@ class OrderService implements OrderServiceInterface
 
         //发送邮件
         return 'success';
+    }
+
+    /**
+     * @inheritDoc
+     * @throws JSONException
+     */
+    public function getTradeAmount(int $num, string $voucher, int $commodityId): array
+    {
+
+        if ($num <= 0) {
+            throw new JSONException("购买数量不能低于1个");
+        }
+
+        //查询商品
+        $commodity = Commodity::query()->find($commodityId);
+
+        if (!$commodity) {
+            throw new JSONException("商品不存在");
+        }
+
+        if ($commodity->status != 1) {
+            throw new JSONException("当前商品已停售，请稍后再试");
+        }
+
+        //获取单价
+        $amount = $this->getAmount($num, $commodity);
+        $price = $amount / $num;
+        $voucherAmount = 0;
+
+        //获取优惠卷
+        if (mb_strlen($voucher) == 8) {
+            $voucherModel = Voucher::query()->where("commodity_id", $commodityId)->where("voucher", $voucher)->first();
+
+            if (!$voucherModel) {
+                throw new JSONException("该优惠卷不存在或不属于该商品");
+            }
+
+            if ($voucherModel->status != 0) {
+                throw new JSONException("该优惠卷已被使用过了");
+            }
+
+            if ($voucherModel->money > $amount) {
+                throw new JSONException("该优惠卷抵扣的金额大于本次消费，无法使用该优惠卷进行抵扣");
+            }
+
+            //进行优惠
+            $amount = $amount - $voucherModel->money;
+            $voucherAmount = $voucherModel->money;
+        }
+
+        return ['price' => $price, 'amount' => $amount, 'voucher' => $voucherAmount];
     }
 }
