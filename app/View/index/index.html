@@ -74,6 +74,62 @@
                 </div>
             </div>
         </div>
+
+        #{if $site.statistics == 1}
+        <style>
+            .fl-lf{
+                float: left;
+                width: 30%;
+                margin: 0;
+
+                display: flex;
+                /*左右居中*/
+                justify-content: center;
+                /*上下居中*/
+                align-items: center;
+            }
+            .fl-lf2{
+                float: left;
+                width: 30%;
+                margin: 0;
+                height: 60px;
+                display: flex;
+                /*左右居中*/
+                justify-content: center;
+                /*上下居中*/
+                align-items: center;
+                font-weight: bold;
+                color: rgba(255, 77, 154, 0.42);
+            }
+        </style>
+
+        <!--            统计部分-->
+        <div class="card">
+            <div class="card-block" style="padding: 0 !important;display: flex;margin-top: 10px;" >
+                <div class="fl-lf2" style="border-right: #ECEFF1 1px solid;">
+                    <i class="fa fa-shopping-cart"></i> <span style="margin-left: 5px;">今日交易</span>
+                </div>
+                <div class="fl-lf2" style="border-right: #ECEFF1 1px solid;"><i class="fa fa-star-half-o"></i><span style="margin-left: 5px;">今日订单</span></div>
+                <div class="fl-lf2" style="border-right: #ECEFF1 1px solid;"><i class="fa fa-modx"></i><span style="margin-left: 5px;">总交易</span></div>
+                <div class="fl-lf2"><i class="fa fa-star"></i><span style="margin-left: 5px;">总订单</span></div>
+            </div>
+            <div class="card-block" style="padding: 0 !important;display: flex;padding-bottom: 20px !important;" >
+                <div class="fl-lf" style="border-right: #ECEFF1 1px solid;">
+                    <span style="color: rgba(255,153,171,0.84);font-weight: bold;">#{$statistics['todaySuccessAmount']}</span>
+                </div>
+                <div class="fl-lf" style="border-right: #ECEFF1 1px solid;">
+                    <span style="color: rgba(255,153,171,0.84);font-weight: bold;">#{$statistics['todaySuccessCount']}</span>
+                </div>
+                <div class="fl-lf" style="border-right: #ECEFF1 1px solid;">
+                    <span style="color: rgba(255,153,171,0.84);font-weight: bold;">#{$statistics['allSuccessAmount']}</span>
+                </div>
+                <div class="fl-lf">
+                    <span style="color: rgba(255,153,171,0.84);font-weight: bold;">#{$statistics['allSuccessCount']}</span>
+                </div>
+            </div>
+        </div>
+
+        #{/if}
     </div>
 </div>
 </div>

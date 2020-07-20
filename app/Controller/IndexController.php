@@ -5,10 +5,10 @@ namespace App\Controller;
 
 
 use App\Model\Category;
+use App\Model\Order;
 use App\Model\Pay;
-use App\Utils\AddressUtil;
+use App\Utils\DateUtil;
 use App\Utils\LocalUtil;
-use Core\Utils\View;
 use Core\Exception\RuntimeException;
 use Illuminate\Database\Eloquent\Builder;
 
@@ -33,7 +33,17 @@ class IndexController extends IndexBaseController
         }])->where("status", 1)->orderBy("sort", "asc")->get()->toArray();
         //获取支付方式
         $pay = Pay::query()->where("status", 1)->get()->toArray();
-        return $this->render('首页', 'index.html', ['category' => $category, 'pay' => $pay]);
+        //获取统计数据
+        //今日盈利
+        $statistics['todaySuccessAmount'] = Order::query()->where("status", 1)->whereBetween('create_date', [DateUtil::calcDay(), DateUtil::calcDay(1)])->sum("amount");
+        //今日订单
+        $statistics['todaySuccessCount'] = Order::query()->where("status", 1)->whereBetween('create_date', [DateUtil::calcDay(), DateUtil::calcDay(1)])->count();
+        //总盈利
+        $statistics['allSuccessAmount'] = Order::query()->where("status", 1)->sum("amount");
+        //总订单
+        $statistics['allSuccessCount'] = Order::query()->where("status", 1)->count();
+
+        return $this->render('首页', 'index.html', ['category' => $category, 'pay' => $pay, 'statistics' => $statistics]);
     }
 
 

@@ -13,7 +13,7 @@
                         <form id="data-form" method="post">
 
                             <div class="form-group">
-                                <label>ICO/图标,注意:请上传.ico后缀的文件哦~</label><br>
+                                <label>网站图标</label><br>
                                 <input type="file" style="display: none;" class="face">
                                 <input type="hidden" name="ico" class="faceInput" value="/favicon.ico">
                                 <img class="display-face" onclick="document.getElementsByClassName('face')[0].click()"
@@ -51,9 +51,17 @@
                                 <label>公告</label>
                                 <textarea class="form-control" name="notice" placeholder="支持HTML语法">#{$config.notice}</textarea>
                             </div>
+
                             <div class="form-group">
+                                <label>查询密码</label><br>
                                 <input type="hidden" name="pass" value="#{$config.pass}" class="passText">
                                 <label><input class="passBtn" type="checkbox" #{if $config.pass == 1} checked #{/if}><span style="color: red;position: relative;top: -1px;left: 5px;">启用密码（客户在查询订单时需要输入购买时填写的查询密码）</span></label>
+                            </div>
+
+                            <div class="form-group">
+                                <label>统计显示</label><br>
+                                <input type="hidden" name="statistics" value="#{$config.statistics}" class="statisticsText">
+                                <label><input class="statisticsBtn" type="checkbox" #{if $config.statistics == 1} checked #{/if}><span style="color: red;position: relative;top: -1px;left: 5px;">显示（显示在前台底部的统计数据）</span></label>
                             </div>
 
                             <br>
@@ -79,6 +87,14 @@
                    $('.passText').val(1);
                }else{
                    $('.passText').val(0);
+               }
+            });
+
+            $('.statisticsBtn').click(function () {
+               if ($(this).prop('checked') == true){
+                   $('.statisticsText').val(1);
+               }else{
+                   $('.statisticsText').val(0);
                }
             });
 

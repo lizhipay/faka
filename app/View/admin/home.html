@@ -131,6 +131,10 @@
                         <div class="tab-content">
                             <div class="tab-pane vivify fadeIn show active" id="Version">
 
+                                <div class="hr-top"><span style="color: red;font-size: 16px;">v1.3.1 - 2020/07/20</span>
+                                    <p>增加前台统计功能，在“网站设置”启用</p>
+                                </div>
+
                                 <div class="hr-top"><span style="color: red;font-size: 16px;">v1.3.0 - 2020/07/20</span>
                                     <p>增加手动发卡后的自定义提示，优化前台界面购买逻辑，如改了数量或优惠卷自动显示需支付价格。</p>
                                 </div>
@@ -169,7 +173,8 @@
                                     本程序为完全开源程序，无任何版权限制您可以没有任何限制使用本程序，比如：二次开发但是，由于本程序搭建后的事情不受作者管制，所以造成的一切法律问题，请自行承担，与作者无任何关系.
                                 </p>
 
-                                <p style="margin-top: 20px;"> <small>Tips：如果您有好的建议以及功能，可以反馈给作者，如果判定您的意见合理，会尽快发起软件更新，届时，您只需要在后台进行在线更新即可！</small></p>
+                                <p style="margin-top: 20px;"><small>Tips：如果您有好的建议以及功能，可以反馈给作者，如果判定您的意见合理，会尽快发起软件更新，届时，您只需要在后台进行在线更新即可！</small>
+                                </p>
 
                                 <p style="margin-top: 20px;"><small>QQ交流群：1142236180</small></p>
                             </div>
@@ -188,7 +193,7 @@
     $.post('/admin/api/version/getVersion', res => {
         versionInfo = res.data;
 
-        $('.versionView').html('v'+res.data.version);
+        $('.versionView').html('v' + res.data.version);
         //如果不相等,等于有新版本咯
         if (res.data.localVersion != res.data.version) {
             $('.newVersionView').show();
