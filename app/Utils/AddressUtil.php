@@ -43,6 +43,6 @@ class AddressUtil
      */
     public static function getUrl(): string
     {
-        return $_SERVER['REQUEST_SCHEME'] . '://' . $_SERVER['HTTP_HOST'] . ($_SERVER['SERVER_PORT'] == 80 ? '' : $_SERVER['SERVER_PORT']);
+        return $_SERVER['REQUEST_SCHEME'] . '://' . $_SERVER['HTTP_HOST'] . ($_SERVER['SERVER_PORT'] == 80 || $_SERVER['SERVER_PORT'] == 443 ? '' : ":" . $_SERVER['SERVER_PORT']);
     }
 }
