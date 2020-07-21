@@ -9,6 +9,7 @@ use App\Entity\DeleteBatchEntity;
 use App\Entity\QueryTemplateEntity;
 use App\Model\Pay;
 use App\Quickly\QueryServiceQuickly;
+use App\Service\PayServiceInterface;
 use Core\Exception\JSONException;
 use App\Interceptor\AdminApiInterceptor;
 use Core\Utils\Bridge;
@@ -20,6 +21,13 @@ use Core\Utils\Bridge;
  */
 class PayController extends AdminApiBaseController
 {
+
+    /**
+     * @Inject
+     * @var PayServiceInterface
+     */
+    public $payService;
+
 
     use QueryServiceQuickly;
 
@@ -82,9 +90,30 @@ class PayController extends AdminApiBaseController
     /**
      * @return array
      */
-    public function editConfig(): array
+    public function getPlatforms(): array
     {
-        Bridge::setConfig('pay', $_POST);
+        $platforms = $this->payService->getPlatforms();
+        return $this->json(200, 'success', $platforms);
+    }
+
+    /**
+     * @return array
+     * @throws JSONException
+     */
+    public function editPlatformConfig(): array
+    {
+        $map = $_POST;
+        if (!$map['id'] === "" || !isset($map['id'])) {
+            throw new JSONException("该支付平台暂未对接");
+        }
+
+        foreach ($map as $k => $v) {
+            $map[$k] = urldecode($v);
+        }
+
+        $id = $map['id'];
+        unset($map['id']);
+        Bridge::setPayConfig($id, $map);
         return $this->json(200, '修改成功');
     }
 

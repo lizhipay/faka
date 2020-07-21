@@ -1,47 +1,16 @@
 #{include file="./header.html"}
 <div id="main-content">
-    <div class="container-fluid" style="margin-top: 20px">
 
+    <div class="container-fluid" style="margin-top: 20px">
         <div class="row clearfix">
 
             <div class="col-xl-12 col-lg-12 col-md-12">
                 <div class="card">
                     <div class="header">
-                        <h2>支付配置（下面的资料信息，请在荔枝付官网：<a href="https://lizhifu.net" target="_blank"><b>https://lizhifu.net</b></a>
-                            注册账号然后获取，注册账号只需要几秒钟即可，不需要审核！）</h2>
+                        <h2>支付配置</h2>
                     </div>
                     <div class="body">
-                        <form id="data-form" method="post">
-
-                            <div class="form-group">
-                                <label>网关地址</label>
-                                <input type="text" name="url" class="form-control" value="#{$pay.url}" placeholder="请输入网关地址，荔枝付控制台中获取">
-                            </div>
-
-                            <div class="form-group">
-                                <label>商户ID</label>
-                                <input type="text" name="merchant_id" class="form-control" value="#{$pay.merchant_id}" placeholder="请输入商户ID，在荔枝付的个人资料里面获取">
-                            </div>
-
-                            <div class="form-group">
-                                <label>应用ID</label>
-                                <input type="text" name="app_id" class="form-control" value="#{$pay.app_id}"  placeholder="请输入应用ID，是荔枝付的应用ID，应用管理里面可以获取到">
-                            </div>
-
-                            <div class="form-group">
-                                <label>商户密钥</label>
-                                <input type="text" name="key" class="form-control" value="#{$pay.key}"  placeholder="请输入商户密钥，荔枝付的商户密钥，在荔枝付的个人资料里面获取">
-                            </div>
-
-                            <div class="form-group">
-                                <label>下单限制(每个IP每分钟最多能够提交多少订单,0代表不限制)</label>
-                                <input type="text" name="ipMinute" class="form-control" value="#{$pay.ipMinute}">
-                            </div>
-
-                            <br>
-                            <button type="button" class="btn btn-primary edit">立即修改</button>
-                        </form>
-
+                        <table id="pay-platform" lay-filter="pay-platform"></table>
                     </div>
                 </div>
             </div>
@@ -51,16 +20,60 @@
 
 
 <script>
+
     $(function () {
-        layui.use(['layer', 'form', 'hex'], function () {
+        layui.use(['table', 'hex'], function () {
+            let table = layui.table;
+            var cao = layui.hex;
 
-            let hex = layui.hex;
+            var tableInstance = table.render({
+                elem: '#pay-platform'
+                , skin: 'nob'
+                , size: 'lg'
+                , height: 740
+                , url: '/admin/api/pay/getPlatforms'
+                , page: false
+                , method: "post"
+                , response: {
+                    statusCode: 200
+                }
+                , cols: [[
+                    {
+                        field: 'name', title: '平台名称', templet: function (item) {
+                            return item.info.name;
+                        }, width: 200
+                    }
+                    , {
+                        field: 'site', title: '平台官网', templet: function (item) {
+                            return '<a href="' + item.info.site + '" target="_blank">' + item.info.site + '</a>';
+                        }, width: 200
+                    }
+                    , {
+                        field: 'desc', title: '简介', templet: function (item) {
+                            return item.info.desc;
+                        }, width: "60%"
+                    }
+                    , {
+                        templet: function (item) {
+                            return '<button type="button" data-id="' + item.id + '" class="btn btn-info layui-btn-xs edit"><i class="fa fa-cog"></i> 商户配置</button>';
+                        }
+                    }
+                ]],
+                done: res => {
+                    cao.setIdMap(res.data);
 
-            $('.edit').click(function () {
-                $.post('/admin/api/pay/editConfig', $('#data-form').serialize(), res => {
-                    layer.msg(res.msg);
-                });
+                    $('.edit').click(function () {
+                        let mapItem = cao.getMapItem(this);
+                        modal(mapItem);
+                    });
+                }
             });
+
+            let modal = (values = {}) => {
+                cao.popup('/admin/api/pay/editPlatformConfig', values.submit, res => {
+                    tableInstance.reload();
+                }, values);
+            }
         });
     });
 </script>

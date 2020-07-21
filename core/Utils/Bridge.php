@@ -61,6 +61,50 @@ declare (strict_types=1);\n\nreturn [\n";
     }
 
     /**
+     * 获取支付配置信息
+     * @param string $name
+     * @return mixed
+     */
+    public static function getPayConfig(string $name)
+    {
+        return require(BASE_PATH . '/app/Pay/' . $name . '/Config/Config.php');
+    }
+
+    /**
+     * 获取支付信息
+     * @param string $name
+     * @return mixed
+     */
+    public static function getPayInfo(string $name)
+    {
+        return require(BASE_PATH . '/app/Pay/' . $name . '/Config/Info.php');
+    }
+
+    /**
+     * 设置支付配置中的键值对
+     * @param string $name
+     * @param array $data
+     * @throws JSONException
+     */
+    public static function setPayConfig(string $name, array $data): void
+    {
+        $config = self::getPayConfig($name);
+        foreach ($data as $x => $b) {
+            $config[$x] = $b;
+        }
+        //写入到文件
+        $ret = "<?php
+declare (strict_types=1);\n\nreturn [\n";
+        foreach ($config as $k => $v) {
+            $ret .= "    '{$k}' => '{$v}',\n";
+        }
+        $ret .= '];';
+        if (file_put_contents(BASE_PATH . '/app/Pay/' . $name . '/Config/Config.php', $ret) === false) {
+            throw new JSONException("没有文件写入权限！");
+        }
+    }
+
+    /**
      * 导入SQL文件
      * @param string $sql
      * @param string $host

@@ -13,4 +13,5 @@ return [
 <div>注意：动态好看的背景，这个是在后台可以调的，也可以使用单独一张静态的图片。</div>',
     'pass' => '0',
     'backgroundUrl' => '/assets/background.png',
+    'statistics' => '1',
 ];

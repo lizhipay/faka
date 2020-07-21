@@ -80,6 +80,20 @@ class OrderController extends IndexBaseController
     }
 
     /**
+     * 订单查询
+     * @param $tradeNo
+     * @return array
+     */
+    public function getOrderInfo($tradeNo): array
+    {
+        $keywords = trim((string)$tradeNo);
+        $filed = ['id', 'trade_no', 'amount', 'status'];
+        $order = Order::query()->where("trade_no", $keywords)->first($filed);
+        //回显订单信息
+        return $this->json(200, 'success', $order->toArray());
+    }
+
+    /**
      * 获取卡密信息
      * @param $orderId
      * @param $pass
@@ -110,11 +124,12 @@ class OrderController extends IndexBaseController
 
     /**
      * 订单回调
+     * @param $handle
      * @return string
      */
-    public function callback(): string
+    public function callback($handle): string
     {
-        return $this->orderService->callback($_POST);
+        return $this->orderService->callback((string)$handle, $_POST);
     }
 
 }

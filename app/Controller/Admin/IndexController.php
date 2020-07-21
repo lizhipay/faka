@@ -131,6 +131,6 @@ class IndexController extends AdminBaseController
      */
     public function payConfig()
     {
-        return $this->render('支付配置', 'payConfig.html', ['pay' => Bridge::getConfig('pay')]);
+        return $this->render('支付配置', 'payConfig.html');
     }
 }

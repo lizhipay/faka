@@ -35,6 +35,15 @@ try {
         $action = end($s);
     }
 
+    $actions = explode('@', $action);
+    $action = $actions[0];
+    unset($actions[0]);
+    foreach ($actions as $act) {
+        $query = explode('=', $act);
+        $_GET[$query[0]] = $query[1];
+    }
+
+
     //检测类是否存在
     if (!class_exists($controller)) {
         throw new \Core\Exception\NotFoundException("Not Found");

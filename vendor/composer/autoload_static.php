@@ -23,6 +23,11 @@ class ComposerStaticInit7ab1f51e8211a049aa399c2be6c697a2
         array (
             'voku\\' => 5,
         ),
+        'Y' => 
+        array (
+            'Yurun\\Util\\' => 11,
+            'Yurun\\PaySDK\\' => 13,
+        ),
         'S' => 
         array (
             'Symfony\\Polyfill\\Php80\\' => 23,
@@ -41,6 +46,7 @@ class ComposerStaticInit7ab1f51e8211a049aa399c2be6c697a2
         'P' => 
         array (
             'Psr\\SimpleCache\\' => 16,
+            'Psr\\Http\\Message\\' => 17,
             'Psr\\Container\\' => 14,
             'PHPMailer\\PHPMailer\\' => 20,
         ),
@@ -71,6 +77,14 @@ class ComposerStaticInit7ab1f51e8211a049aa399c2be6c697a2
         'voku\\' => 
         array (
             0 => __DIR__ . '/..' . '/voku/portable-ascii/src/voku',
+        ),
+        'Yurun\\Util\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/yurunsoft/yurun-http/src',
+        ),
+        'Yurun\\PaySDK\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/yurunsoft/pay-sdk/src',
         ),
         'Symfony\\Polyfill\\Php80\\' => 
         array (
@@ -123,6 +137,10 @@ class ComposerStaticInit7ab1f51e8211a049aa399c2be6c697a2
         'Psr\\SimpleCache\\' => 
         array (
             0 => __DIR__ . '/..' . '/psr/simple-cache/src',
+        ),
+        'Psr\\Http\\Message\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/psr/http-message/src',
         ),
         'Psr\\Container\\' => 
         array (

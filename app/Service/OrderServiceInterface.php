@@ -36,8 +36,9 @@ interface OrderServiceInterface
 
 
     /**
+     * @param string $handle
      * @param array $map
      * @return mixed
      */
-    public function callback(array $map): string;
+    public function callback(string $handle, array $map): string;
 }

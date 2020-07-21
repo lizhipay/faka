@@ -7,8 +7,7 @@
             <div class="col-xl-12 col-lg-12 col-md-12">
                 <div class="card">
                     <div class="header">
-                        <h2>支付方式（所有支付方式均对接“荔枝支付”，如需要使用支付功能，请在官网：<a href="https://lizhifu.net" target="_blank"><b>https://lizhifu.net</b></a>
-                            注册账号！），如果没有您想要的支付，可联系作者可免费帮忙对接（任意支付平台,对接可在30分钟内完成对接）！</h2>
+                        <h2>支付方式</h2>
                     </div>
                     <div class="body">
                         <button type="button" class="btn btn-acg mb-2 btn-app-create"><i
@@ -28,7 +27,37 @@
     $(function () {
         layui.use(['table', 'hex'], function () {
             let table = layui.table;
-            var cao = layui.hex;
+            let cao = layui.hex;
+            let platform = [];
+            let platformMaps = [];
+
+            let layIndex = layer.load(1, {
+                shade: [0.3, '#fff'] //0.1透明度的白色背景
+            });
+            $.ajaxSettings.async = false;
+            //加载支付
+            $.post('/admin/api/pay/getPlatforms', res => {
+                layer.close(layIndex);
+                res.data.forEach(item => {
+                    platform[item.id] = item;
+                });
+                platformMaps = res.data;
+            });
+            $.ajaxSettings.async = true;
+
+            let getType = function (handle, code) {
+                if (handle == null) {
+                    return '-';
+                }
+                return platform[handle].info.list[code];
+            }
+
+            let getPlatName = function (handle) {
+                if (handle == null) {
+                    return '-';
+                }
+                return platform[handle].info.name;
+            }
 
             var tableInstance = table.render({
                 elem: '#pay-type'
@@ -52,9 +81,15 @@
                         }
                     }
                     , {field: 'name', title: '支付名称'}
+
                     , {
-                        field: 'code', title: '通道编码', templet: function (item) {
-                            return '<span class="badge badge-primary">' + item.code + '</span>';
+                        field: 'code', title: '支付方式', templet: function (item) {
+                            return '<span class="badge badge-primary">' + getType(item.handle, item.code) + '</span>';
+                        }
+                    }
+                    , {
+                        field: 'platname', title: '所属平台', templet: function (item) {
+                            return getPlatName(item.handle);
                         }
                     }
                     , {
@@ -118,15 +153,57 @@
                 }
             });
 
-            let modal = (values = {}) => {
+            let modalPay = function (values = {}, id) {
+                layer.closeAll();
+                let listDict = [];
+                let list = platform[id].info.list;
+                for (let index in list) {
+                    listDict.push({id: index, name: list[index]})
+                }
                 cao.popup('/admin/api/pay/save', [
+                    {name: "handle", type: "hidden", default: id},
                     {title: "显示图标", name: "face", type: "image", placeholder: "请选择64*64的图片", width: 64},
                     {title: "支付名称", name: "name", type: "input", placeholder: "请输入支付方式名称（前台显示用）"},
-                    {title: "通道编码", name: "code", type: "input", placeholder: "请在荔枝付控制台获取通道ID"},
+                    {
+                        title: "支付类型",
+                        name: "code",
+                        type: "select",
+                        dict: listDict,
+                        placeholder: "请选择支付类型"
+                    },
                     {title: "状态", name: "status", type: "switch", text: "启用"},
                 ], res => {
                     tableInstance.reload();
                 }, values);
+            }
+
+            let modal = (values = {}) => {
+                let dict = [];
+                platformMaps.forEach(item => {
+                    dict.push({id: item.id, name: item.info.name});
+                });
+
+                if (values.hasOwnProperty('handle') && values.handle !== "" && values.handle != null) {
+                    modalPay(values, values.handle);
+                    return;
+                }
+                cao.popup('', [
+                    {
+                        title: "支付平台",
+                        name: "platform",
+                        type: "select",
+                        dict: dict,
+                        placeholder: "请选择支付平台",
+                        cache: false,
+                        edit: false,
+                        change(id) {
+                            values.handle = id;
+                            modalPay(values, id);
+                        }
+                    }
+                ], res => {
+                }, values, '600px');
+
             }
 
             $('.btn-app-create').click(function () {

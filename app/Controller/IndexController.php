@@ -10,6 +10,7 @@ use App\Model\Pay;
 use App\Utils\DateUtil;
 use App\Utils\LocalUtil;
 use Core\Exception\RuntimeException;
+use Core\Utils\View;
 use Illuminate\Database\Eloquent\Builder;
 
 /**
@@ -56,5 +57,22 @@ class IndexController extends IndexBaseController
     {
         $tradeNo = (string)$_GET['tradeNo'];
         return $this->render('订单查询', 'query.html', ['tradeNo' => $tradeNo]);
+    }
+
+    /**
+     * @param string $handle
+     * @param string $code
+     * @param string $tradeNo
+     * @return string
+     * @throws \SmartyException
+     */
+    public function pay($handle, $code, $tradeNo): string
+    {
+        //获取订单信息
+        $order = Order::query()->where("trade_no", $tradeNo)->first();
+        if (!$order) {
+            return '订单不存在';
+        }
+        return View::render($handle . '/View/' . $code . '.html', ['order' => $order], BASE_PATH . '/app/Pay/');
     }
 }

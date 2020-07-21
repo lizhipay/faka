@@ -4,16 +4,17 @@ declare (strict_types=1);
 namespace App\Service\impl;
 
 
+use App\Entity\PayEntity;
 use App\Model\Card;
 use App\Model\Commodity;
 use App\Model\Order;
 use App\Model\Pay;
 use App\Model\Voucher;
+use App\Pay\PayInterface;
 use App\Service\OrderServiceInterface;
 use App\Utils\AddressUtil;
 use App\Utils\DateUtil;
 use App\Utils\EmailUtil;
-use App\Utils\HttpUtil;
 use App\Utils\StringUtil;
 use Core\Exception\JSONException;
 use Core\Utils\Bridge;
@@ -199,31 +200,36 @@ class OrderService implements OrderServiceInterface
                     $order->commodity = $message;
                 }
             } else {
-                //需要进行下单到第三方平台购买
-                $payConfig = Bridge::getConfig('pay');
-
-                $postData = [
-                    'merchant_id' => $payConfig['merchant_id'],
-                    'amount' => $order->amount,
-                    'channel_id' => $pay->code,
-                    'app_id' => $payConfig['app_id'],
-                    'notification_url' => AddressUtil::getUrl() . '/index/api/order/callback',
-                    'sync_url' => AddressUtil::getUrl() . '/index/query?tradeNo=' . $order->trade_no,
-                    'ip' => $ip,
-                    'out_trade_no' => $order->trade_no
-                ];
-
-                $postData['sign'] = StringUtil::generateSignature($postData, $payConfig['key']);
-
-                $request = HttpUtil::request(trim($payConfig['url'], "/") . '/order/trade', $postData);
-
-                $json = json_decode((string)$request, true);
-
-                if ($json['code'] != 200) {
-                    throw new JSONException($json['msg']);
+                //支付类
+                $class = "\\App\\Pay\\{$pay->handle}\\Pay";
+                if (!class_exists($class)) {
+                    throw new JSONException("该支付方式未实现接口，无法使用");
                 }
+                $payObject = new $class;
+                $payObject->amount = $order->amount;
+                $payObject->tradeNo = $order->trade_no;
+                $payObject->config = Bridge::getPayConfig($pay->handle);
+                $payObject->callbackUrl = AddressUtil::getUrl() . '/index/api/order/callback@handle=' . $pay->handle;
+                $payObject->returnUrl = AddressUtil::getUrl() . '/index/query?tradeNo=' . $order->trade_no;
+                $payObject->clientIp = $ip;
+                $payObject->code = $pay->code;
+                $trade = $payObject->trade();
 
-                $url = $json['data']['url'];
+                if ($trade instanceof PayEntity) {
+                    $order->payUrl = $trade->getUrl();
+
+                    switch ($trade->getType()) {
+                        case PayInterface::TYPE_JUMP:
+                            $url = $order->payUrl;
+                            break;
+                        case PayInterface::TYPE_LOCAL:
+                            $url = '/index/pay/?handle=' . $pay->handle . '&code=' . $pay->code . '&tradeNo=' . $order->trade_no;
+                            break;
+                    }
+
+                } else {
+                    throw new JSONException("支付方式未部署成功");
+                }
             }
             $order->save();
 
@@ -260,27 +266,96 @@ class OrderService implements OrderServiceInterface
         return $num * $price;
     }
 
+
     /**
      * @inheritDoc
+     * @throws JSONException
      */
-    public function callback(array $map): string
+    public function getTradeAmount(int $num, string $voucher, int $commodityId): array
     {
-        //验证签名
-        $payConfig = Bridge::getConfig('pay');
-        $user = Bridge::getConfig('user');
-        if ($map['sign'] != StringUtil::generateSignature($map, $payConfig['key'])) {
-            return 'sign error';
-        }
-        //验证状态
-        if ($map['status'] != 1) {
-            return 'status error';
+
+        if ($num <= 0) {
+            throw new JSONException("购买数量不能低于1个");
         }
 
-        $order = DB::transaction(function () use ($map, $user) {
+        //查询商品
+        $commodity = Commodity::query()->find($commodityId);
+
+        if (!$commodity) {
+            throw new JSONException("商品不存在");
+        }
+
+        if ($commodity->status != 1) {
+            throw new JSONException("当前商品已停售，请稍后再试");
+        }
+
+        //获取单价
+        $amount = $this->getAmount($num, $commodity);
+        $price = $amount / $num;
+        $voucherAmount = 0;
+
+        //获取优惠卷
+        if (mb_strlen($voucher) == 8) {
+            $voucherModel = Voucher::query()->where("commodity_id", $commodityId)->where("voucher", $voucher)->first();
+
+            if (!$voucherModel) {
+                throw new JSONException("该优惠卷不存在或不属于该商品");
+            }
+
+            if ($voucherModel->status != 0) {
+                throw new JSONException("该优惠卷已被使用过了");
+            }
+
+            if ($voucherModel->money > $amount) {
+                throw new JSONException("该优惠卷抵扣的金额大于本次消费，无法使用该优惠卷进行抵扣");
+            }
+
+            //进行优惠
+            $amount = $amount - $voucherModel->money;
+            $voucherAmount = $voucherModel->money;
+        }
+
+        return ['price' => $price, 'amount' => $amount, 'voucher' => $voucherAmount];
+    }
+
+    /**
+     * @inheritDoc
+     * @throws JSONException
+     */
+    public function callback(string $handle, array $map): string
+    {
+        $payInfo = Bridge::getPayInfo($handle);
+        $payConfig = Bridge::getPayConfig($handle);
+        $callback = $payInfo['callback'];
+        $user = Bridge::getConfig('user');
+        if ($callback['isSign']) {
+            $class = "\\App\\Pay\\{$handle}\\Signature";
+            if (!class_exists($class)) {
+                throw new JSONException("Signature Not implements Interface");
+            }
+            $signature = new $class;
+            if (!$signature->verification($map, $payConfig)) {
+                throw new JSONException("sign error");
+            }
+        }
+
+        if ($callback['isStatus']) {
+            //验证状态
+            if ($map[$callback['status']] != $callback['statusValue']) {
+                return 'status error';
+            }
+        }
+
+        $order = DB::transaction(function () use ($map, $user, $callback) {
             //获取订单
-            $order = Order::query()->where("trade_no", $map['out_trade_no'])->where("status", 0)->first();
+            $order = Order::query()->where("trade_no", $map[$callback['tradeNo']])->where("status", 0)->first();
+
             if (!$order) {
                 throw new JSONException("order not found");
+            }
+
+            if ($order->amount != $map[$callback['amount']]) {
+                throw new JSONException("amount error");
             }
 
             $shop = $order->shop;
@@ -332,58 +407,6 @@ class OrderService implements OrderServiceInterface
             EmailUtil::send($emailConfig, $siteConfig['title'], $order->commodity, $shop->name, $order->contact);
         }
 
-        //发送邮件
-        return 'success';
-    }
-
-    /**
-     * @inheritDoc
-     * @throws JSONException
-     */
-    public function getTradeAmount(int $num, string $voucher, int $commodityId): array
-    {
-
-        if ($num <= 0) {
-            throw new JSONException("购买数量不能低于1个");
-        }
-
-        //查询商品
-        $commodity = Commodity::query()->find($commodityId);
-
-        if (!$commodity) {
-            throw new JSONException("商品不存在");
-        }
-
-        if ($commodity->status != 1) {
-            throw new JSONException("当前商品已停售，请稍后再试");
-        }
-
-        //获取单价
-        $amount = $this->getAmount($num, $commodity);
-        $price = $amount / $num;
-        $voucherAmount = 0;
-
-        //获取优惠卷
-        if (mb_strlen($voucher) == 8) {
-            $voucherModel = Voucher::query()->where("commodity_id", $commodityId)->where("voucher", $voucher)->first();
-
-            if (!$voucherModel) {
-                throw new JSONException("该优惠卷不存在或不属于该商品");
-            }
-
-            if ($voucherModel->status != 0) {
-                throw new JSONException("该优惠卷已被使用过了");
-            }
-
-            if ($voucherModel->money > $amount) {
-                throw new JSONException("该优惠卷抵扣的金额大于本次消费，无法使用该优惠卷进行抵扣");
-            }
-
-            //进行优惠
-            $amount = $amount - $voucherModel->money;
-            $voucherAmount = $voucherModel->money;
-        }
-
-        return ['price' => $price, 'amount' => $amount, 'voucher' => $voucherAmount];
+        return $callback['return'];
     }
 }
