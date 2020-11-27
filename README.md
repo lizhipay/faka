@@ -10,7 +10,7 @@
 - 后台演示：[https://faka.demo.10.do/admin](https://faka.demo.10.do/admin)  账号：admin 密码：123456
 - 前台演示：[https://faka.demo.10.do](https://faka.demo.10.do)
 
-## 关于荔枝发卡系统
+## 关于荔枝发卡系统 
 
 荔枝发卡系统乃博主历尽数天开发完成，原生php开发，数据库底层使用`Eloquent ORM`组件，模板渲染使用`Smarty3.1`组件，会话保持使用`session`开发，欢迎各位欧尼酱使用以及转载。
 
