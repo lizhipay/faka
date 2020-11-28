@@ -12,9 +12,9 @@ return [
     ],
     'callback' => [
         'isSign' => true,
-        'status' => 'status',
-        'statusValue' => '',
-        'isStatus' => false,
+        'status' => 'trade_status',
+        'statusValue' => 'TRADE_SUCCESS',
+        'isStatus' => true,
         'tradeNo' => 'out_trade_no',
         'amount' => 'total_amount',
         'return' => 'success'

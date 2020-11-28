@@ -143,7 +143,7 @@ CREATE TABLE `__PREFIX__order`
     `voucher_id`    int(11) UNSIGNED                                        NULL     DEFAULT NULL COMMENT '优惠卷ID',
     `exts`          text CHARACTER SET utf8 COLLATE utf8_general_ci         NULL COMMENT '扩展信息存放字段',
     `send`          tinyint(4) UNSIGNED                                     NOT NULL DEFAULT 1 COMMENT '发货状态',
-    `payUrl`        varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL     DEFAULT NULL COMMENT '支付地址',
+    `payUrl`        text CHARACTER SET utf8 COLLATE utf8_general_ci NULL     DEFAULT NULL COMMENT '支付地址',
     PRIMARY KEY (`id`) USING BTREE,
     UNIQUE INDEX `trade_no` (`trade_no`) USING BTREE,
     INDEX `pay_id` (`pay_id`) USING BTREE,
