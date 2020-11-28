@@ -23,7 +23,8 @@
     "rah/danpu": "^2.7",
     "ext-json": "*",
     "phpmailer/phpmailer": "^6.1",
-    "yurunsoft/pay-sdk": "~3.0"
+    "yurunsoft/pay-sdk": "~3.0",
+    "ext-openssl": "*"
   },
   "autoload": {
     "psr-4": {

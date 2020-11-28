@@ -170,7 +170,6 @@ CREATE TABLE `__PREFIX__pay`
     `create_date` datetime(0)                                             NOT NULL COMMENT '创建时间',
     `handle`      varchar(32) CHARACTER SET utf8 COLLATE utf8_general_ci  NULL     DEFAULT NULL COMMENT '支付处理器',
     PRIMARY KEY (`id`) USING BTREE,
-    UNIQUE INDEX `code` (`code`) USING BTREE,
     INDEX `status` (`status`) USING BTREE
 ) ENGINE = InnoDB
   AUTO_INCREMENT = 11
