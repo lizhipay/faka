@@ -129,6 +129,7 @@ class OrderController extends IndexBaseController
      */
     public function callback($handle): string
     {
+        //file_put_contents(BASE_PATH . '/log.txt', json_encode($_POST));
         return $this->orderService->callback((string)$handle, $_POST);
     }
 
