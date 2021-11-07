@@ -7,8 +7,8 @@
 </p>
 
 ## 快速体验
-- 后台演示：[https://faka.demo.10.do/admin](https://faka.demo.10.do/admin)  账号：admin 密码：123456
-- 前台演示：[https://faka.demo.10.do](https://faka.demo.10.do)
+- 后台演示：[https://faka.demo.10.do/admin](https://faka.demo.10.do/admin)  账号：admin 密码：123456  - 暂时暂停访问
+- 前台演示：[https://faka.demo.10.do](https://faka.demo.10.do) - 暂时暂停访问
 
 ## 关于荔枝发卡系统
 
@@ -40,18 +40,19 @@ location / {
 <p>所有更新都支持手动升级，如果你当前版本并不是最新版本的上个版本，那么你必须依次按照版本进行手动升级，直到最新版本为止。</p>
 <p style="color: red;">手动升级方法：下载升级包后，有两个文件夹，file文件夹里的文件复制到根目录覆盖替换即可，sql文件夹里面的update.sql如果有内容，表示这个版本需要更新数据库某些地方，需要你手动复制到你的数据库执行一次。</p>
 
-- 2020/11/28：紧急更新，修复部分支付方式无法正常下单，手动升级包：[2.2.0.zip](https://version.10.do/faka/update/2.2.0.zip)
-- 2020/11/28：修复无法添加支付方式bug，手动升级包：[2.1.0.zip](https://version.10.do/faka/update/2.1.0.zip)
-- 2020/07/21：将支付功能完全重构并且内置到发卡系统，以插件的形式开发，自由对接任意平台，手动升级包：[2.0.0.zip](https://version.10.do/faka/update/2.0.0.zip)
-- 2020/07/20：增加自定义支付网关地址，所有更新该版本的请在"支付配置"中填写网关地址，否则支付无法使用，手动升级包：[1.3.2.zip](https://version.10.do/faka/update/1.3.2.zip)
-- 2020/07/20：增加前台统计功能，在“网站设置”启用，手动升级包：[1.3.1.zip](https://version.10.do/faka/update/1.3.1.zip)
-- 2020/07/20：增加手动发卡后的自定义提示，优化前台界面购买逻辑，如改了数量或优惠卷自动显示需支付价格，手动升级包：[1.3.0.zip](https://version.10.do/faka/update/1.3.0.zip)
-- 2020/07/20：紧急修复支付成功后的发卡的bug，手动升级包：[1.2.2.zip](https://version.10.do/faka/update/1.2.2.zip)
-- 2020/07/20：修复https下单时，域名后面多了个443端口号，手动升级包：[1.2.1.zip](https://version.10.do/faka/update/1.2.1.zip)
-- 2020/07/19：增加手动发卡和自动发卡功能，增加邮件通知功能，手动升级包：[1.2.0.zip](https://version.10.do/faka/update/1.2.0.zip)
-- 2020/07/19：修复下单时，程序无法打开支付页面问题，手动升级包：[1.1.1.zip](https://version.10.do/faka/update/1.1.1.zip)
-- 2020/07/19：发布1.1.0版本，大更新，添加/修改商品增加新功能“扩展信息”功能，手动升级包：[1.1.0.zip](https://version.10.do/faka/update/1.1.0.zip)
-- 2020/07/18：更新1.0.1版本，BUG修复，修复拦截器没有成功注入，手动升级包：[1.0.1.zip](https://version.10.do/faka/update/1.0.1.zip)
+- 2021/11/07：新增Kvmpay支付渠道，超级好用，免挂监控的码支付，支持QQ钱包/ZFB/WX，手动升级包：[2.2.1.zip](https://version.lizhi.acg.sb/faka/update/2.2.1.zip)
+- 2020/11/28：紧急更新，修复部分支付方式无法正常下单，手动升级包：[2.2.0.zip](https://version.lizhi.acg.sb/faka/update/2.2.0.zip)
+- 2020/11/28：修复无法添加支付方式bug，手动升级包：[2.1.0.zip](https://version.lizhi.acg.sb/faka/update/2.1.0.zip)
+- 2020/07/21：将支付功能完全重构并且内置到发卡系统，以插件的形式开发，自由对接任意平台，手动升级包：[2.0.0.zip](https://version.lizhi.acg.sb/faka/update/2.0.0.zip)
+- 2020/07/20：增加自定义支付网关地址，所有更新该版本的请在"支付配置"中填写网关地址，否则支付无法使用，手动升级包：[1.3.2.zip](https://version.lizhi.acg.sb/faka/update/1.3.2.zip)
+- 2020/07/20：增加前台统计功能，在“网站设置”启用，手动升级包：[1.3.1.zip](https://version.lizhi.acg.sb/faka/update/1.3.1.zip)
+- 2020/07/20：增加手动发卡后的自定义提示，优化前台界面购买逻辑，如改了数量或优惠卷自动显示需支付价格，手动升级包：[1.3.0.zip](https://version.lizhi.acg.sb/faka/update/1.3.0.zip)
+- 2020/07/20：紧急修复支付成功后的发卡的bug，手动升级包：[1.2.2.zip](https://version.lizhi.acg.sb/faka/update/1.2.2.zip)
+- 2020/07/20：修复https下单时，域名后面多了个443端口号，手动升级包：[1.2.1.zip](https://version.lizhi.acg.sb/faka/update/1.2.1.zip)
+- 2020/07/19：增加手动发卡和自动发卡功能，增加邮件通知功能，手动升级包：[1.2.0.zip](https://version.lizhi.acg.sb/faka/update/1.2.0.zip)
+- 2020/07/19：修复下单时，程序无法打开支付页面问题，手动升级包：[1.1.1.zip](https://version.lizhi.acg.sb/faka/update/1.1.1.zip)
+- 2020/07/19：发布1.1.0版本，大更新，添加/修改商品增加新功能“扩展信息”功能，手动升级包：[1.1.0.zip](https://version.lizhi.acg.sb/faka/update/1.1.0.zip)
+- 2020/07/18：更新1.0.1版本，BUG修复，修复拦截器没有成功注入，手动升级包：[1.0.1.zip](https://version.lizhi.acg.sb/faka/update/1.0.1.zip)
 - 2020/07/17：发布1.0.0版本。
 ## 更多支持
 - 交流QQ群：1142236180

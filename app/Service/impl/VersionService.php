@@ -25,7 +25,7 @@ class VersionService implements VersionServiceInterface
         //只是为了记录一下那个网站使用了本程序,没其他任何用途
         //如果您觉得不适应,可以删除该代码,不影响获取版本号,以及自动更新
         $domain = $_SERVER['HTTP_HOST'] . ($_SERVER['SERVER_PORT'] == 80 || $_SERVER['SERVER_PORT'] == 443 ? '' : ':' . $_SERVER['SERVER_PORT']);
-        $request = HttpUtil::request('https://version.10.do/faka/version.php?domain=' . $domain);
+        $request = HttpUtil::request('https://version.lizhi.acg.sb/faka/version.php?domain=' . $domain);
         $json = json_decode($request, true);
         return (array)$json;
     }
