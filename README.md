@@ -7,11 +7,12 @@
 </p>
 
 ## 新版本通知
-异次元发卡1.0 即将发布（原：荔枝发卡2.0升级为3.0），重构所有代码，增加用户系统，以及更多开放式功能，全新的系统，依然开源，依然追求极致二次元，抢先体验QQ群：128215049
+- 异次元发卡系统已经发布，[https://github.com/lizhipay/acg-faka](https://github.com/lizhipay/acg-faka)
+- 交流QQ群：128215049
 
 ## 快速体验
-- 后台演示：[https://faka.demo.10.do/admin](https://faka.demo.10.do/admin)  账号：admin 密码：123456
-- 前台演示：[https://faka.demo.10.do](https://faka.demo.10.do)
+- 后台演示：[https://demo.faka.acged.cc/admin](https://demo.faka.acged.cc/admin)  账号：demo@demo.com 密码：123456
+- 前台演示：[https://demo.faka.acged.cc](https://demo.faka.acged.cc) 账号：为了明天美好而战斗 密码：123456
 
 ## 关于荔枝发卡系统
 
