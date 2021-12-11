@@ -64,37 +64,6 @@
             list-style: none
         }
 
-        :root {
-            --blue: #007BFF;
-            --indigo: #6610F2;
-            --purple: #6F42C1;
-            --pink: #E83E8C;
-            --red: #DC3545;
-            --orange: #FD7E14;
-            --yellow: #FFC107;
-            --green: #28A745;
-            --teal: #20C997;
-            --cyan: #17A2B8;
-            --white: #FFFFFF;
-            --gray: #6C757D;
-            --gray-dark: #343A40;
-            --primary: #666EE8;
-            --secondary: #868E96;
-            --success: #28D094;
-            --info: #1E9FF2;
-            --warning: #FF9149;
-            --danger: #FF4961;
-            --light: #F8F9FA;
-            --dark: #343A40;
-            --base: #9E9E9E;
-            --breakpoint-xs: 0;
-            --breakpoint-sm: 576px;
-            --breakpoint-md: 768px;
-            --breakpoint-lg: 992px;
-            --breakpoint-xl: 1200px;
-            --font-family-sans-serif: 'Montserrat', 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-            --font-family-monospace: SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace
-        }
 
         *, ::after, ::before {
             -webkit-box-sizing: border-box;
@@ -111,9 +80,6 @@
             -webkit-tap-highlight-color: transparent
         }
 
-        @-ms-viewport {
-            widdevice-width
-        }
 
         body {
             margin: 0;
@@ -189,7 +155,7 @@
         }
 
         fieldset {
-            min-wid0;
+            min-width: 0;
             padding: 0;
             margin: 0;
             border: 0
@@ -217,32 +183,9 @@
             padding-left: 15px;
             margin-right: auto;
             margin-left: auto;
-            wid100%
+            width: 100%;
         }
 
-        @media (min-wid576px) {
-            .container {
-                max-wid540px
-            }
-        }
-
-        @media (min-wid768px) {
-            .container {
-                max-wid720px
-            }
-        }
-
-        @media (min-wid992px) {
-            .container {
-                max-wid960px
-            }
-        }
-
-        @media (min-wid1200px) {
-            .container {
-                max-wid1140px
-            }
-        }
 
         .row {
             display: -webkit-box;
@@ -259,7 +202,7 @@
 
         .col, .col-3, .col-md-2, .col-md-5, .col-md-7 {
             position: relative;
-            wid100%;
+            width: 100%;
             min-height: 1px;
             padding-right: 15px;
             padding-left: 15px
@@ -274,7 +217,7 @@
             -moz-box-flex: 1;
             -ms-flex-positive: 1;
             flex-grow: 1;
-            max-wid100%
+            max-width: 100%
         }
 
         .col-3 {
@@ -286,40 +229,11 @@
             -moz-box-flex: 0;
             -ms-flex: 0 0 25%;
             flex: 0 0 25%;
-            max-wid25%
+            max-width: 25%
         }
 
         .offset-9 {
             margin-left: 75%
-        }
-
-        @media (min-wid768px) {
-            .col-md-2 {
-                -webkit-box-flex: 0;
-                -webkit-flex: 0 0 16.66667%;
-                -moz-box-flex: 0;
-                -ms-flex: 0 0 16.66667%;
-                flex: 0 0 16.66667%;
-                max-wid16 .66667%
-            }
-
-            .col-md-5 {
-                -webkit-box-flex: 0;
-                -webkit-flex: 0 0 41.66667%;
-                -moz-box-flex: 0;
-                -ms-flex: 0 0 41.66667%;
-                flex: 0 0 41.66667%;
-                max-wid41 .66667%
-            }
-
-            .col-md-7 {
-                -webkit-box-flex: 0;
-                -webkit-flex: 0 0 58.33333%;
-                -moz-box-flex: 0;
-                -ms-flex: 0 0 58.33333%;
-                flex: 0 0 58.33333%;
-                max-wid58 .33333%
-            }
         }
 
         .form-control {
@@ -704,7 +618,7 @@
             -moz-box-align: stretch;
             -ms-flex-align: stretch;
             align-items: stretch;
-            wid100%
+            width: 100%;
         }
 
         .input-group > .form-control {
@@ -714,7 +628,7 @@
             -moz-box-flex: 1;
             -ms-flex: 1 1 auto;
             flex: 1 1 auto;
-            wid1%;
+            width: 1%;
             margin-bottom: 0
         }
 
@@ -840,7 +754,7 @@
 
         .navbar-toggler-icon {
             display: inline-block;
-            wid1 .5em;
+            width: 1.5em;
             height: 1.5em;
             vertical-align: middle;
             background: center center no-repeat;
@@ -848,61 +762,6 @@
             background-size: 100% 100%
         }
 
-        @media (max-wid991.98px
-
-        ) {
-            .navbar-expand-lg > .container {
-                padding-right: 0;
-                padding-left: 0
-            }
-        }
-
-        @media (min-wid992px) {
-            .navbar-expand-lg, .navbar-expand-lg .navbar-nav {
-                -webkit-box-orient: horizontal;
-                -webkit-box-direction: normal;
-                -moz-box-orient: horizontal;
-                -moz-box-direction: normal
-            }
-
-            .navbar-expand-lg {
-                -webkit-flex-flow: row nowrap;
-                -ms-flex-flow: row nowrap;
-                flex-flow: row nowrap;
-                -webkit-box-pack: start;
-                -webkit-justify-content: flex-start;
-                -moz-box-pack: start;
-                -ms-flex-pack: start;
-                justify-content: flex-start
-            }
-
-            .navbar-expand-lg .navbar-nav {
-                -webkit-flex-direction: row;
-                -ms-flex-direction: row;
-                flex-direction: row
-            }
-
-            .navbar-expand-lg > .container {
-                -webkit-flex-wrap: nowrap;
-                -ms-flex-wrap: nowrap;
-                flex-wrap: nowrap
-            }
-
-            .navbar-expand-lg .navbar-collapse {
-                display: -webkit-box !important;
-                display: -webkit-flex !important;
-                display: -moz-box !important;
-                display: -ms-flexbox !important;
-                display: flex !important;
-                -webkit-flex-basis: auto;
-                -ms-flex-preferred-size: auto;
-                flex-basis: auto
-            }
-
-            .navbar-expand-lg .navbar-toggler {
-                display: none
-            }
-        }
 
         .card {
             -webkit-box-orient: vertical;
@@ -930,7 +789,7 @@
             -webkit-flex-direction: column;
             -ms-flex-direction: column;
             flex-direction: column;
-            min-wid0;
+            min-width: 0;
             word-wrap: break-word;
             background-color: #FFF;
             -webkit-background-clip: border-box;
@@ -1041,15 +900,6 @@
             margin-right: auto !important
         }
 
-        @media (min-wid576px) {
-            .my-sm-0 {
-                margin-top: 0 !important
-            }
-
-            .my-sm-0 {
-                margin-bottom: 0 !important
-            }
-        }
 
         .text-right {
             text-align: right !important
@@ -1088,7 +938,7 @@
             }
 
             .container, body {
-                min-wid992px !important
+                min-width: 992px !important
             }
 
             .navbar {
@@ -1263,7 +1113,7 @@
         }
 
         html {
-            wid100%
+            width: 100%;
         }
 
         * {
@@ -1324,7 +1174,6 @@
 
         .wrapper.menu-collapsed .app-sidebar:not(:hover)[data-background-color=white] .navigation li.nav-collapsed-open a, .wrapper.menu-collapsed .off-canvas-sidebar:not(:hover)[data-background-color=white] .navigation li.nav-collapsed-open a {
             background-image: -webkit-linear-gradient(45deg, #FC00FF, #00DBDE);
-            background-image: -moz- oldlinear-gradient(45deg, #FC00FF, #00DBDE);
             background-image: -o-linear-gradient(45deg, #FC00FF, #00DBDE);
             background-image: linear-gradient(45deg, #FC00FF, #00DBDE);
             background-repeat: repeat-x;
@@ -1345,7 +1194,6 @@
 
         .wrapper .app-sidebar:not(:hover)[data-background-color=white] .navigation li.active a, .wrapper .off-canvas-sidebar:not(:hover)[data-background-color=white] .navigation li.active a {
             background-image: -webkit-linear-gradient(45deg, #FC00FF, #00DBDE);
-            background-image: -moz- oldlinear-gradient(45deg, #FC00FF, #00DBDE);
             background-image: -o-linear-gradient(45deg, #FC00FF, #00DBDE);
             background-image: linear-gradient(45deg, #FC00FF, #00DBDE);
             background-repeat: repeat-x
@@ -1359,11 +1207,7 @@
             color: #FF4961
         }
 
-        @media (max-wid992px) {
-            .navbar {
-                padding: 0 25px
-            }
-        }
+
 
         .btn:active:focus, .btn:focus {
             outline: 0

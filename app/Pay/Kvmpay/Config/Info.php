@@ -2,9 +2,9 @@
 declare (strict_types=1);
 
 return [
-    'name' => 'Kvmpay',
-    'site' => 'https://doc.kvmpay.cn/',
-    'desc' => '一个超简单免挂监控的码支付系统，支付宝/微信/QQ钱包',
+    'name' => '易支付',
+    'site' => '#',
+    'desc' => '支持易支付协议',
     'list' => [
         'alipay' => '支付宝',
         'wxpay' => '微信',

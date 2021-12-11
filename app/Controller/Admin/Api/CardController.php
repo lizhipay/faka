@@ -57,6 +57,7 @@ class CardController extends AdminApiBaseController
         if ($cards == '') {
             throw new JSONException('欧尼酱，请至少添加1条卡密信息哦，否则是无法成功的~');
         }
+
         $cards = explode(PHP_EOL, $cards);
         $count = count($cards);
         $success = 0;
