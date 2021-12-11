@@ -44,7 +44,7 @@ location / {
 <p>所有更新都支持手动升级，如果你当前版本并不是最新版本的上个版本，那么你必须依次按照版本进行手动升级，直到最新版本为止。</p>
 <p style="color: red;">手动升级方法：下载升级包后，有两个文件夹，file文件夹里的文件复制到根目录覆盖替换即可，sql文件夹里面的update.sql如果有内容，表示这个版本需要更新数据库某些地方，需要你手动复制到你的数据库执行一次。</p>
 
-- 2021/11/07：新增Kvmpay支付渠道，超级好用，免挂监控的码支付，支持QQ钱包/ZFB/WX，手动升级包：[2.2.1.zip](https://version.lizhi.acg.sb/faka/update/2.2.1.zip)
+- 2021/11/07：新增易支付
 - 2020/11/28：紧急更新，修复部分支付方式无法正常下单，手动升级包：[2.2.0.zip](https://version.lizhi.acg.sb/faka/update/2.2.0.zip)
 - 2020/11/28：修复无法添加支付方式bug，手动升级包：[2.1.0.zip](https://version.lizhi.acg.sb/faka/update/2.1.0.zip)
 - 2020/07/21：将支付功能完全重构并且内置到发卡系统，以插件的形式开发，自由对接任意平台，手动升级包：[2.0.0.zip](https://version.lizhi.acg.sb/faka/update/2.0.0.zip)
